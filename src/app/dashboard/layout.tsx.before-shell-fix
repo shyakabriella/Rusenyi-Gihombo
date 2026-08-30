@@ -1,0 +1,44 @@
+import AuthGuard from "@/components/auth/auth-guard";
+import {
+  CurrentUserProvider,
+} from "@/components/auth/current-user-context";
+
+import DashboardFooter from "@/components/layout/dashboard-footer";
+import DashboardSidebar from "@/components/layout/dashboard-sidebar";
+import {
+  DashboardSidebarProvider,
+} from "@/components/layout/dashboard-sidebar-context";
+import DashboardTopbar from "@/components/layout/dashboard-topbar";
+
+export default function DashboardLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <AuthGuard>
+      <CurrentUserProvider>
+        <DashboardSidebarProvider>
+          <div className="min-h-screen bg-[#fbfaf7]">
+            {/* SIDEBAR */}
+            <DashboardSidebar />
+
+            {/* MAIN DASHBOARD AREA */}
+            <div className="flex min-h-screen flex-col lg:pl-[290px]">
+              {/* HEADER */}
+              <DashboardTopbar />
+
+              {/* PAGE CONTENT */}
+              <main className="flex-1 overflow-x-hidden bg-[#fbfaf7] px-4 py-5 sm:px-5 lg:px-7">
+                {children}
+              </main>
+
+              {/* FOOTER */}
+              <DashboardFooter />
+            </div>
+          </div>
+        </DashboardSidebarProvider>
+      </CurrentUserProvider>
+    </AuthGuard>
+  );
+}

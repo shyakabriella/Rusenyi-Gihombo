@@ -1,0 +1,386 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import {
+  ChartNoAxesColumnIncreasing,
+  ChevronLeft,
+  CircleDollarSign,
+  Coffee,
+  FileCheck2,
+  LayoutDashboard,
+  Settings,
+  Store,
+  Truck,
+  Users,
+  UserCog,
+  X,
+} from "lucide-react";
+
+import {
+  getUserInitials,
+  roleLabels,
+  useCurrentUser,
+} from "@/components/auth/current-user-context";
+import { useDashboardSidebar } from "@/components/layout/dashboard-sidebar-context";
+
+const menuItems = [
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+  },
+  {
+    label: "Coffee Operations",
+    href: "/dashboard/coffee-operations",
+    icon: Coffee,
+  },
+  {
+    label: "People",
+    href: "/dashboard/people",
+    icon: Users,
+  },
+  {
+    label: "Finance",
+    href: "/dashboard/finance",
+    icon: CircleDollarSign,
+  },
+  {
+    label: "Logistics",
+    href: "/dashboard/logistics",
+    icon: Truck,
+  },
+  {
+    label: "Store & Processing",
+    href: "/dashboard/store-processing",
+    icon: Store,
+  },
+  {
+    label: "Approvals",
+    href: "/dashboard/approvals",
+    icon: FileCheck2,
+    badge: "6",
+  },
+  {
+    label: "Reports",
+    href: "/dashboard/reports",
+    icon: ChartNoAxesColumnIncreasing,
+  },
+  {
+    label: "User Management",
+    href: "/dashboard/users",
+    icon: UserCog,
+  },
+  {
+    label: "Administration",
+    href: "/dashboard/administration",
+    icon: Settings,
+  },
+];
+
+export default function DashboardSidebar() {
+  const pathname = usePathname();
+
+  const {
+    user,
+    loading: userLoading,
+  } = useCurrentUser();
+
+  const {
+    mobileOpen,
+    desktopCollapsed,
+    closeMobileSidebar,
+    toggleDesktopSidebar,
+  } = useDashboardSidebar();
+
+  function isActive(href: string) {
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
+    }
+
+    return pathname.startsWith(href);
+  }
+
+  const userName =
+    user?.name ??
+    (userLoading
+      ? "Loading..."
+      : "Unknown User");
+
+  const userRole =
+    user?.role
+      ? roleLabels[user.role]
+      : userLoading
+        ? "Loading..."
+        : "Unknown Role";
+
+  const initials =
+    getUserInitials(user?.name);
+
+  return (
+    <>
+      {/* Mobile backdrop */}
+      <button
+        type="button"
+        aria-label="Close navigation"
+        onClick={closeMobileSidebar}
+        className={[
+          "fixed inset-0 z-40 bg-slate-950/30 backdrop-blur-[2px]",
+          "transition-all duration-300 lg:hidden",
+          mobileOpen
+            ? "visible opacity-100"
+            : "invisible opacity-0",
+        ].join(" ")}
+      />
+
+      {/* Sidebar */}
+      <aside
+        className={[
+          "fixed inset-y-0 left-0 z-50 flex h-dvh flex-col",
+          "border-r border-[#e8dfd2] bg-[#fffdf9]",
+          "shadow-[12px_0_35px_rgba(44,31,15,0.12)]",
+          "transition-[transform,width,box-shadow] duration-300",
+          "ease-[cubic-bezier(0.4,0,0.2,1)]",
+          "lg:relative lg:z-20 lg:translate-x-0 lg:shadow-none",
+          mobileOpen
+            ? "translate-x-0"
+            : "-translate-x-full",
+          desktopCollapsed
+            ? "w-[270px] lg:w-[82px]"
+            : "w-[270px] lg:w-[250px]",
+        ].join(" ")}
+      >
+        {/* Mobile close */}
+        <button
+          type="button"
+          onClick={closeMobileSidebar}
+          aria-label="Close sidebar"
+          className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 transition hover:bg-[#f5eee4] hover:text-slate-900 lg:hidden"
+        >
+          <X size={20} />
+        </button>
+
+        {/* Desktop collapse button */}
+        <button
+          type="button"
+          onClick={toggleDesktopSidebar}
+          aria-label={
+            desktopCollapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+          }
+          className={[
+            "absolute -right-3 top-[96px] z-30 hidden",
+            "h-7 w-7 items-center justify-center rounded-full",
+            "border border-[#e1d3c0] bg-white text-[#6d5331]",
+            "shadow-[0_4px_14px_rgba(50,35,15,0.12)]",
+            "transition-all duration-300",
+            "hover:scale-110 hover:bg-[#f8f1e7]",
+            "lg:flex",
+          ].join(" ")}
+        >
+          <ChevronLeft
+            size={15}
+            className={[
+              "transition-transform duration-300",
+              desktopCollapsed
+                ? "rotate-180"
+                : "rotate-0",
+            ].join(" ")}
+          />
+        </button>
+
+        {/* Brand */}
+        <div
+          className={[
+            "flex shrink-0 flex-col items-center",
+            "transition-all duration-300",
+            desktopCollapsed
+              ? "px-2 pb-4 pt-5 lg:px-2"
+              : "px-5 pb-4 pt-5",
+          ].join(" ")}
+        >
+          <div
+            className={[
+              "relative transition-all duration-300",
+              desktopCollapsed
+                ? "lg:scale-[0.72]"
+                : "scale-100",
+            ].join(" ")}
+          >
+            <Image
+              src="/logo.png"
+              alt="Rusenyi High Lands Speciality Coffee Limited"
+              width={88}
+              height={88}
+              priority
+              className="h-[88px] w-[88px] object-contain"
+            />
+          </div>
+
+          <div
+            className={[
+              "overflow-hidden text-center",
+              "transition-all duration-300",
+              desktopCollapsed
+                ? "lg:max-h-0 lg:translate-y-[-8px] lg:opacity-0"
+                : "max-h-20 translate-y-0 opacity-100",
+            ].join(" ")}
+          >
+            <h2 className="mt-2 whitespace-nowrap font-serif text-[13px] font-semibold uppercase leading-[17px] text-slate-900">
+              Rusenyi High Lands
+              <br />
+              Speciality Coffee Limited
+            </h2>
+
+            <div className="mx-auto mt-3 h-px w-28 bg-[#d9ad59]" />
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="min-h-0 flex-1 overflow-hidden px-3 py-2">
+          <div className="space-y-0.5">
+            {menuItems.map((item) => {
+              const Icon = item.icon;
+              const active = isActive(
+                item.href,
+              );
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  title={
+                    desktopCollapsed
+                      ? item.label
+                      : undefined
+                  }
+                  onClick={
+                    closeMobileSidebar
+                  }
+                  className={[
+                    "group relative flex h-[40px] items-center rounded-lg",
+                    "transition-all duration-200",
+                    desktopCollapsed
+                      ? "lg:justify-center lg:px-0"
+                      : "gap-3 px-3.5",
+                    active
+                      ? "bg-[#f3e5cf] font-semibold text-[#56350d]"
+                      : "text-slate-700 hover:bg-[#f8f3eb] hover:text-[#56350d]",
+                  ].join(" ")}
+                >
+                  {/* Active indicator */}
+                  <span
+                    className={[
+                      "absolute left-0 top-1/2 h-5 w-[3px]",
+                      "-translate-y-1/2 rounded-r-full bg-[#b77b25]",
+                      "transition-all duration-300",
+                      active
+                        ? "scale-y-100 opacity-100"
+                        : "scale-y-0 opacity-0",
+                    ].join(" ")}
+                  />
+
+                  <Icon
+                    size={18}
+                    strokeWidth={1.8}
+                    className={[
+                      "shrink-0 transition-all duration-200",
+                      active
+                        ? "text-[#6b4514]"
+                        : "text-slate-600 group-hover:text-[#6b4514]",
+                      "group-hover:scale-105",
+                    ].join(" ")}
+                  />
+
+                  <span
+                    className={[
+                      "min-w-0 flex-1 truncate text-[13px]",
+                      "transition-all duration-300",
+                      desktopCollapsed
+                        ? "lg:w-0 lg:flex-none lg:translate-x-[-6px] lg:opacity-0"
+                        : "translate-x-0 opacity-100",
+                    ].join(" ")}
+                  >
+                    {item.label}
+                  </span>
+
+                  {item.badge && (
+                    <span
+                      className={[
+                        "flex h-5 min-w-5 items-center justify-center",
+                        "rounded-full bg-[#d99a2b] px-1",
+                        "text-[10px] font-semibold text-white",
+                        "transition-all duration-300",
+                        desktopCollapsed
+                          ? "lg:absolute lg:right-1 lg:top-1 lg:h-4 lg:min-w-4 lg:text-[8px]"
+                          : "",
+                      ].join(" ")}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+
+                  {/* Desktop collapsed tooltip */}
+                  {desktopCollapsed && (
+                    <span
+                      className={[
+                        "pointer-events-none absolute left-[68px] z-[60]",
+                        "hidden whitespace-nowrap rounded-md",
+                        "bg-slate-900 px-2.5 py-1.5",
+                        "text-[11px] font-medium text-white",
+                        "opacity-0 shadow-lg",
+                        "transition-all duration-200",
+                        "group-hover:translate-x-1 group-hover:opacity-100",
+                        "lg:block",
+                      ].join(" ")}
+                    >
+                      {item.label}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* User profile */}
+        <div className="shrink-0 p-3">
+          <div
+            className={[
+              "flex items-center rounded-xl border border-[#e5dccf]",
+              "bg-white transition-all duration-300",
+              desktopCollapsed
+                ? "lg:justify-center lg:px-2 lg:py-2.5"
+                : "gap-3 px-3 py-2.5",
+            ].join(" ")}
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f4e7d2] text-xs font-semibold text-[#56350d]">
+              {userLoading ? "…" : initials}
+            </div>
+
+            <div
+              className={[
+                "min-w-0 overflow-hidden",
+                "transition-all duration-300",
+                desktopCollapsed
+                  ? "lg:w-0 lg:translate-x-[-5px] lg:opacity-0"
+                  : "flex-1 translate-x-0 opacity-100",
+              ].join(" ")}
+            >
+              <p className="truncate text-xs font-semibold text-slate-900">
+                {userName}
+              </p>
+
+              <p className="text-[10px] text-slate-500">
+                {userRole}
+              </p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
+  );
+}

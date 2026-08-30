@@ -1,0 +1,452 @@
+"use client";
+
+import {
+  BadgeDollarSign,
+  Coffee,
+  HandCoins,
+  PackageCheck,
+} from "lucide-react";
+
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+const stats = [
+  {
+    label: "Coffee Received Today",
+    value: "3,850",
+    suffix: "KG",
+    growth: "12.5%",
+    icon: Coffee,
+  },
+  {
+    label: "Coffee Purchased Today",
+    value: "3,420",
+    suffix: "KG",
+    growth: "8.4%",
+    icon: PackageCheck,
+  },
+  {
+    label: "Money Used",
+    value: "8,745,000",
+    suffix: "RWF",
+    growth: "10.3%",
+    icon: HandCoins,
+  },
+  {
+    label: "Available Cash",
+    value: "24,560,000",
+    suffix: "RWF",
+    growth: "5.7%",
+    icon: BadgeDollarSign,
+  },
+];
+
+const weekly = [
+  { day: "Sat", date: "17 May", kg: 2450 },
+  { day: "Sun", date: "18 May", kg: 2980 },
+  { day: "Mon", date: "19 May", kg: 3120 },
+  { day: "Tue", date: "20 May", kg: 4050 },
+  { day: "Wed", date: "21 May", kg: 3860 },
+  { day: "Thu", date: "22 May", kg: 3410 },
+  { day: "Fri", date: "23 May", kg: 3850 },
+];
+
+const sourceData = [
+  { name: "From Agents", value: 2240 },
+  { name: "From Farmers", value: 1180 },
+];
+
+const activities = [
+  {
+    title: "Trip received",
+    description: "Trip TRP-2025-0623-07 received from Gitesi sector.",
+    time: "10:25 AM",
+  },
+  {
+    title: "Factory weighing completed",
+    description: "Weighing completed for TRP-2025-0623-07 (850 KG).",
+    time: "09:45 AM",
+  },
+  {
+    title: "Farmer payment recorded",
+    description: "Payment of 2,135,000 RWF recorded for 23 farmers.",
+    time: "09:20 AM",
+  },
+  {
+    title: "Agent collection submitted",
+    description: "Napiriba Coffee Agent submitted 620 KG collection.",
+    time: "08:15 AM",
+  },
+  {
+    title: "Pending agent approval",
+    description: "Request of 1500 KG requires your approval.",
+    time: "08:05 AM",
+  },
+];
+
+const agents = [
+  ["Napiriba Coffee Agent", "5,640", "13,536,000", "12"],
+  ["Rubavu Coffee Agent", "4,320", "10,152,000", "9"],
+  ["Gitesi Coffee Agent", "3,780", "9,072,000", "8"],
+  ["Gitesi Coffee Agent", "3,210", "7,704,000", "7"],
+  ["Musanze Coffee Agent", "2,890", "6,936,000", "6"],
+];
+
+function StatCard({
+  item,
+}: {
+  item: (typeof stats)[number];
+}) {
+  const Icon = item.icon;
+
+  return (
+    <div className="min-w-0 rounded-xl border border-[#eee4d6] bg-white p-4 shadow-[0_2px_10px_rgba(64,43,16,0.04)]">
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f6ead8] text-[#155f3d]">
+          <Icon size={21} strokeWidth={1.8} />
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] font-medium text-[#28313f]">
+            {item.label}
+          </p>
+
+          <div className="mt-2 flex items-end justify-between gap-2">
+            <p className="text-[19px] font-semibold tracking-tight text-gray-950">
+              {item.value}
+            </p>
+
+            <span className="pb-0.5 text-[9px] font-medium text-[#4b5563]">
+              {item.suffix}
+            </span>
+          </div>
+
+          <p className="mt-2 text-[10px] text-[#4b5563]">
+            {item.growth === "No change" ? (
+              "No change"
+            ) : (
+              <>
+                <span className="font-medium text-[#0a6a3f]">
+                  ↑ {item.growth}
+                </span>{" "}
+                vs yesterday
+              </>
+            )}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Panel({
+  title,
+  action,
+  children,
+  className = "",
+}: {
+  title: string;
+  action?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      className={`rounded-xl border border-[#eee4d6] bg-white shadow-[0_2px_10px_rgba(64,43,16,0.035)] ${className}`}
+    >
+      <div className="flex h-12 items-center justify-between border-b border-[#f1e8dc] px-4">
+        <h2 className="font-serif text-[13px] font-semibold text-gray-900">
+          {title}
+        </h2>
+
+        {action && (
+          <button className="text-[10px] font-medium text-[#16613e]">
+            {action}
+          </button>
+        )}
+      </div>
+
+      {children}
+    </section>
+  );
+}
+
+export default function AdminDashboard() {
+  return (
+    <div className="w-full min-w-0 space-y-3 overflow-hidden">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((item) => (
+          <StatCard key={item.label} item={item} />
+        ))}
+      </div>
+
+      <div className="grid gap-3 xl:grid-cols-[0.9fr_1.25fr_1.05fr]">
+        <Panel
+          title="Alerts & Recent Activities"
+          action="View all"
+        >
+          <div className="divide-y divide-gray-100 px-3">
+            {activities.map((activity, index) => (
+              <div
+                key={index}
+                className="flex items-start gap-3 py-3"
+              >
+                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#17623f] text-white">
+                  <Coffee size={13} />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex justify-between gap-2">
+                    <p className="truncate text-[10px] font-semibold text-gray-800">
+                      {activity.title}
+                    </p>
+
+                    <span className="shrink-0 text-[9px] font-medium text-[#667085]">
+                      {activity.time}
+                    </span>
+                  </div>
+
+                  <p className="mt-1 truncate text-[9px] font-medium text-[#5b6470]">
+                    {activity.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel
+          title="Coffee Received Over the Week (KG)"
+          action="View report"
+        >
+          <div className="h-[245px] p-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={weekly}>
+                <CartesianGrid
+                  vertical={false}
+                  stroke="#eee9e1"
+                />
+
+                <XAxis
+                  dataKey="day"
+                  tick={{ fontSize: 9 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+
+                <YAxis
+                  tick={{ fontSize: 9 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+
+                <Tooltip />
+
+                <Line
+                  type="monotone"
+                  dataKey="kg"
+                  stroke="#145b38"
+                  strokeWidth={2}
+                  dot={{
+                    fill: "#145b38",
+                    r: 4,
+                    strokeWidth: 0,
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Panel>
+
+        <Panel
+          title="Coffee Source Breakdown (Today)"
+          action="View report"
+        >
+          <div className="grid min-h-[245px] grid-cols-1 sm:grid-cols-[150px_1fr] items-center gap-2 px-4">
+            <div className="h-[160px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={sourceData}
+                    dataKey="value"
+                    innerRadius={42}
+                    outerRadius={66}
+                    strokeWidth={0}
+                    fill="#155f3d"
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+
+            <div className="space-y-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#155f3d]" />
+                  <p className="text-[10px] font-semibold text-[#344054]">
+                    From Agents
+                  </p>
+                </div>
+
+                <p className="ml-5 mt-1 text-[10px] text-[#374151]">
+                  2,240 KG (65.5%)
+                </p>
+              </div>
+
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#d99a2b]" />
+                  <p className="text-[10px] font-semibold text-[#344054]">
+                    From Farmers
+                  </p>
+                </div>
+
+                <p className="ml-5 mt-1 text-[10px] text-[#374151]">
+                  1,180 KG (34.5%)
+                </p>
+              </div>
+
+              <div className="border-t border-[#e4bb7a] pt-3">
+                <div className="flex justify-between">
+                  <span className="text-[11px] font-semibold text-[#344054]">
+                    Total
+                  </span>
+
+                  <span className="text-[12px] font-semibold text-[#155f3d]">
+                    3,420 KG
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Panel>
+      </div>
+
+      <div className="grid gap-3 xl:grid-cols-[1.15fr_1fr_1fr]">
+        <Panel
+          title="Top Agent Performance (This Month)"
+          action="View full report"
+        >
+          <div className="w-full overflow-x-auto p-3">
+            <table className="min-w-[620px] w-full text-left text-[9px] text-[#344054]">
+              <thead className="bg-[#f6eddf] text-[#3b2c1b]">
+                <tr>
+                  <th className="px-2 py-2">#</th>
+                  <th className="px-2 py-2">Agent Name</th>
+                  <th className="px-2 py-2">
+                    Coffee Collected
+                  </th>
+                  <th className="px-2 py-2">Amount (RWF)</th>
+                  <th className="px-2 py-2">Trips</th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-gray-100">
+                {agents.map((agent, index) => (
+                  <tr key={index} className="text-[#475467]">
+                    <td className="px-2 py-2">
+                      {index + 1}
+                    </td>
+                    <td className="px-2 py-2">
+                      {agent[0]}
+                    </td>
+                    <td className="px-2 py-2">
+                      {agent[1]}
+                    </td>
+                    <td className="px-2 py-2">
+                      {agent[2]}
+                    </td>
+                    <td className="px-2 py-2">
+                      {agent[3]}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Panel>
+
+        <Panel title="Operational Summary (Today)">
+          <div className="space-y-3 p-4">
+            {[
+              ["Total Trips Completed", "7"],
+              ["Total Coffee Received", "3,850 KG"],
+              ["Total Coffee Purchased", "3,420 KG"],
+              ["Average Price (RWF / KG)", "2,550"],
+              ["Farmers Paid", "2,135,000 RWF"],
+            ].map(([label, value]) => (
+              <div
+                key={label}
+                className="flex items-center justify-between"
+              >
+                <span className="text-[10px] text-[#374151]">
+                  {label}
+                </span>
+
+                <span className="text-[11px] font-semibold text-gray-900">
+                  {value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Panel>
+
+        <Panel
+          title="Cash Summary"
+          action="View report"
+        >
+          <div className="p-4">
+            <div className="space-y-4">
+              <div className="flex justify-between text-[10px]">
+                <span className="font-medium text-[#475467]">
+                  Opening Cash (Today)
+                </span>
+                <span className="font-medium">
+                  16,250,000 RWF
+                </span>
+              </div>
+
+              <div className="flex justify-between text-[10px]">
+                <span className="text-[#374151]">
+                  Total Cash In
+                </span>
+                <span className="font-medium text-[#167245]">
+                  18,325,000 RWF
+                </span>
+              </div>
+
+              <div className="flex justify-between text-[10px]">
+                <span className="text-[#374151]">
+                  Total Cash Out
+                </span>
+                <span className="font-medium text-red-500">
+                  10,015,000 RWF
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-5 border-t border-[#dba557] pt-4">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold text-[#344054]">
+                  Available Cash
+                </span>
+
+                <span className="text-[13px] font-bold text-[#15613d]">
+                  24,560,000 RWF
+                </span>
+              </div>
+            </div>
+          </div>
+        </Panel>
+      </div>
+    </div>
+  );
+}
