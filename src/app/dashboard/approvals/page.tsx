@@ -1,10 +1,7 @@
-import DashboardPage from "@/components/shared/dashboard-page";
+import { redirect } from "next/navigation";
 
-export default function ApprovalsPage() {
-  return (
-    <DashboardPage
-      title="Approvals"
-      description="Review and approve pending coffee, financial and operational requests."
-    />
+export default function ApprovalsRedirect() {
+  redirect(
+    "/dashboard/finance/approvals",
   );
 }

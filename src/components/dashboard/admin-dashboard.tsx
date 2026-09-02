@@ -1,17 +1,25 @@
 "use client";
 
+import Link from "next/link";
+
+import type {
+  LucideIcon,
+} from "lucide-react";
+
 import {
   BadgeDollarSign,
   Coffee,
   HandCoins,
   PackageCheck,
+  RefreshCw,
+  Truck,
+  UsersRound,
+  Warehouse,
 } from "lucide-react";
-
-import AccountantDashboard from "@/components/dashboard/accountant-dashboard";
-import { useCurrentUser } from "@/components/auth/current-user-context";
 
 import {
   CartesianGrid,
+  Cell,
   Line,
   LineChart,
   Pie,
@@ -22,100 +30,105 @@ import {
   YAxis,
 } from "recharts";
 
-const stats = [
-  {
-    label: "Coffee Received Today",
-    value: "3,850",
-    suffix: "KG",
-    growth: "12.5%",
-    icon: Coffee,
-  },
-  {
-    label: "Coffee Purchased Today",
-    value: "3,420",
-    suffix: "KG",
-    growth: "8.4%",
-    icon: PackageCheck,
-  },
-  {
-    label: "Money Used",
-    value: "8,745,000",
-    suffix: "RWF",
-    growth: "10.3%",
-    icon: HandCoins,
-  },
-  {
-    label: "Available Cash",
-    value: "24,560,000",
-    suffix: "RWF",
-    growth: "5.7%",
-    icon: BadgeDollarSign,
-  },
-];
+import AccountantDashboard from "@/components/dashboard/accountant-dashboard";
 
-const weekly = [
-  { day: "Sat", date: "17 May", kg: 2450 },
-  { day: "Sun", date: "18 May", kg: 2980 },
-  { day: "Mon", date: "19 May", kg: 3120 },
-  { day: "Tue", date: "20 May", kg: 4050 },
-  { day: "Wed", date: "21 May", kg: 3860 },
-  { day: "Thu", date: "22 May", kg: 3410 },
-  { day: "Fri", date: "23 May", kg: 3850 },
-];
+import {
+  useCurrentUser,
+} from "@/components/auth/current-user-context";
 
-const sourceData = [
-  { name: "From Agents", value: 2240 },
-  { name: "From Farmers", value: 1180 },
-];
+import {
+  useDashboardOverview,
+} from "@/hooks/use-dashboard-overview";
 
-const activities = [
-  {
-    title: "Trip received",
-    description: "Trip TRP-2025-0623-07 received from Gitesi sector.",
-    time: "10:25 AM",
-  },
-  {
-    title: "Factory weighing completed",
-    description: "Weighing completed for TRP-2025-0623-07 (850 KG).",
-    time: "09:45 AM",
-  },
-  {
-    title: "Farmer payment recorded",
-    description: "Payment of 2,135,000 RWF recorded for 23 farmers.",
-    time: "09:20 AM",
-  },
-  {
-    title: "Agent collection submitted",
-    description: "Napiriba Coffee Agent submitted 620 KG collection.",
-    time: "08:15 AM",
-  },
-  {
-    title: "Pending agent approval",
-    description: "Request of 1500 KG requires your approval.",
-    time: "08:05 AM",
-  },
-];
+import type {
+  DashboardMetric,
+} from "@/types/dashboard";
 
-const agents = [
-  ["Napiriba Coffee Agent", "5,640", "13,536,000", "12"],
-  ["Rubavu Coffee Agent", "4,320", "10,152,000", "9"],
-  ["Gitesi Coffee Agent", "3,780", "9,072,000", "8"],
-  ["Gitesi Coffee Agent", "3,210", "7,704,000", "7"],
-  ["Musanze Coffee Agent", "2,890", "6,936,000", "6"],
-];
+type StatItem = {
+  label: string;
+  metric: DashboardMetric;
+  icon: LucideIcon;
+};
+
+function formatNumber(
+  value: number,
+  maximumFractionDigits = 2,
+) {
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      maximumFractionDigits,
+    },
+  ).format(value);
+}
+
+function formatTime(
+  value?: string | null,
+) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime(),
+    )
+  ) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(
+    "en-US",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  ).format(date);
+}
+
+function changeText(
+  metric: DashboardMetric,
+) {
+  if (
+    metric.change_percent === null
+  ) {
+    return "Current balance";
+  }
+
+  if (
+    metric.change_percent === 0
+  ) {
+    return "No change";
+  }
+
+  const positive =
+    metric.change_percent > 0;
+
+  return `${positive ? "↑" : "↓"} ${Math.abs(
+    metric.change_percent,
+  )}% vs yesterday`;
+}
 
 function StatCard({
   item,
 }: {
-  item: (typeof stats)[number];
+  item: StatItem;
 }) {
   const Icon = item.icon;
+
+  const change =
+    item.metric.change_percent;
 
   return (
     <div className="min-w-0 rounded-xl border border-[#eee4d6] bg-white p-4 shadow-[0_2px_10px_rgba(64,43,16,0.04)]">
       <div className="flex items-start gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f6ead8] text-[#155f3d]">
-          <Icon size={21} strokeWidth={1.8} />
+          <Icon
+            size={21}
+            strokeWidth={1.8}
+          />
         </div>
 
         <div className="min-w-0 flex-1">
@@ -124,25 +137,27 @@ function StatCard({
           </p>
 
           <div className="mt-2 flex items-end justify-between gap-2">
-            <p className="text-[19px] font-semibold tracking-tight text-gray-950">
-              {item.value}
+            <p className="truncate text-[19px] font-semibold tracking-tight text-gray-950">
+              {formatNumber(
+                item.metric.value,
+              )}
             </p>
 
-            <span className="pb-0.5 text-[9px] font-medium text-[#4b5563]">
-              {item.suffix}
+            <span className="shrink-0 pb-0.5 text-[9px] font-medium text-[#4b5563]">
+              {item.metric.unit}
             </span>
           </div>
 
-          <p className="mt-2 text-[10px] text-[#4b5563]">
-            {item.growth === "No change" ? (
-              "No change"
-            ) : (
-              <>
-                <span className="font-medium text-[#0a6a3f]">
-                  ↑ {item.growth}
-                </span>{" "}
-                vs yesterday
-              </>
+          <p
+            className={`mt-2 text-[10px] ${
+              change !== null &&
+              change < 0
+                ? "text-red-600"
+                : "text-[#0a6a3f]"
+            }`}
+          >
+            {changeText(
+              item.metric,
             )}
           </p>
         </div>
@@ -158,7 +173,7 @@ function Panel({
   className = "",
 }: {
   title: string;
-  action?: string;
+  action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }) {
@@ -166,16 +181,12 @@ function Panel({
     <section
       className={`rounded-xl border border-[#eee4d6] bg-white shadow-[0_2px_10px_rgba(64,43,16,0.035)] ${className}`}
     >
-      <div className="flex h-12 items-center justify-between border-b border-[#f1e8dc] px-4">
+      <div className="flex min-h-12 items-center justify-between gap-3 border-b border-[#f1e8dc] px-4 py-2">
         <h2 className="font-serif text-[13px] font-semibold text-gray-900">
           {title}
         </h2>
 
-        {action && (
-          <button className="text-[10px] font-medium text-[#16613e]">
-            {action}
-          </button>
-        )}
+        {action}
       </div>
 
       {children}
@@ -183,14 +194,9 @@ function Panel({
   );
 }
 
-export default function AdminDashboard() {
-  const {
-    user,
-    loading,
-  } = useCurrentUser();
-
-  if (loading) {
-    return (
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-3">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({
           length: 4,
@@ -201,63 +207,204 @@ export default function AdminDashboard() {
           />
         ))}
       </div>
+
+      <div className="grid gap-3 xl:grid-cols-3">
+        {Array.from({
+          length: 3,
+        }).map((_, index) => (
+          <div
+            key={index}
+            className="h-[295px] animate-pulse rounded-xl border border-[#eee4d6] bg-white"
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminLiveDashboard() {
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useDashboardOverview();
+
+  if (
+    loading &&
+    !data
+  ) {
+    return <DashboardSkeleton />;
+  }
+
+  if (!data) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-5">
+        <p className="text-sm font-semibold text-red-700">
+          {error ||
+            "Unable to load dashboard."}
+        </p>
+
+        <button
+          type="button"
+          onClick={() =>
+            void refresh()
+          }
+          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-xs font-semibold text-white"
+        >
+          <RefreshCw size={15} />
+          Try Again
+        </button>
+      </div>
     );
   }
 
-  if (user?.role === "accountant") {
-    return <AccountantDashboard />;
-  }
+  const stats: StatItem[] = [
+    {
+      label:
+        "Coffee Received Today",
+      metric:
+        data.cards
+          .coffee_received_today,
+      icon: Coffee,
+    },
+    {
+      label:
+        "Coffee Purchased Today",
+      metric:
+        data.cards
+          .coffee_purchased_today,
+      icon: PackageCheck,
+    },
+    {
+      label: "Money Used",
+      metric:
+        data.cards
+          .money_used_today,
+      icon: HandCoins,
+    },
+    {
+      label: "Available Cash",
+      metric:
+        data.cards.available_cash,
+      icon: BadgeDollarSign,
+    },
+  ];
+
+  const sourceTotal =
+    data.source_breakdown.reduce(
+      (total, item) =>
+        total + item.value,
+      0,
+    );
 
   return (
     <div className="w-full min-w-0 space-y-3 overflow-hidden">
+      {error ? (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-800">
+          <span>{error}</span>
+
+          <button
+            type="button"
+            onClick={() =>
+              void refresh()
+            }
+            className="font-semibold"
+          >
+            Refresh
+          </button>
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {stats.map((item) => (
-          <StatCard key={item.label} item={item} />
+          <StatCard
+            key={item.label}
+            item={item}
+          />
         ))}
       </div>
 
       <div className="grid gap-3 xl:grid-cols-[0.9fr_1.25fr_1.05fr]">
         <Panel
           title="Alerts & Recent Activities"
-          action="View all"
+          action={
+            <Link
+              href="/dashboard/audit-trail"
+              className="text-[10px] font-medium text-[#16613e]"
+            >
+              View all
+            </Link>
+          }
         >
           <div className="divide-y divide-gray-100 px-3">
-            {activities.map((activity, index) => (
-              <div
-                key={index}
-                className="flex items-start gap-3 py-3"
-              >
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#17623f] text-white">
-                  <Coffee size={13} />
-                </div>
+            {data.recent_activities
+              .length ? (
+              data.recent_activities.map(
+                (activity) => (
+                  <div
+                    key={activity.id}
+                    className="flex items-start gap-3 py-3"
+                  >
+                    <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#17623f] text-white">
+                      <Coffee
+                        size={13}
+                      />
+                    </div>
 
-                <div className="min-w-0 flex-1">
-                  <div className="flex justify-between gap-2">
-                    <p className="truncate text-[10px] font-semibold text-gray-800">
-                      {activity.title}
-                    </p>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex justify-between gap-2">
+                        <p className="truncate text-[10px] font-semibold capitalize text-gray-800">
+                          {
+                            activity.title
+                          }
+                        </p>
 
-                    <span className="shrink-0 text-[9px] font-medium text-[#667085]">
-                      {activity.time}
-                    </span>
+                        <span className="shrink-0 text-[9px] font-medium text-[#667085]">
+                          {formatTime(
+                            activity.created_at,
+                          )}
+                        </span>
+                      </div>
+
+                      <p className="mt-1 line-clamp-2 text-[9px] font-medium leading-4 text-[#5b6470]">
+                        {
+                          activity.description
+                        }
+                      </p>
+                    </div>
                   </div>
-
-                  <p className="mt-1 truncate text-[9px] font-medium text-[#5b6470]">
-                    {activity.description}
-                  </p>
-                </div>
+                ),
+              )
+            ) : (
+              <div className="py-10 text-center text-xs text-slate-500">
+                No recent activity.
               </div>
-            ))}
+            )}
           </div>
         </Panel>
 
         <Panel
           title="Coffee Received Over the Week (KG)"
-          action="View report"
+          action={
+            <Link
+              href="/dashboard/reports"
+              className="text-[10px] font-medium text-[#16613e]"
+            >
+              View report
+            </Link>
+          }
         >
           <div className="h-[245px] p-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={weekly}>
+            <ResponsiveContainer
+              width="100%"
+              height="100%"
+            >
+              <LineChart
+                data={
+                  data.weekly_received
+                }
+              >
                 <CartesianGrid
                   vertical={false}
                   stroke="#eee9e1"
@@ -265,13 +412,17 @@ export default function AdminDashboard() {
 
                 <XAxis
                   dataKey="day"
-                  tick={{ fontSize: 9 }}
+                  tick={{
+                    fontSize: 9,
+                  }}
                   axisLine={false}
                   tickLine={false}
                 />
 
                 <YAxis
-                  tick={{ fontSize: 9 }}
+                  tick={{
+                    fontSize: 9,
+                  }}
                   axisLine={false}
                   tickLine={false}
                 />
@@ -296,184 +447,300 @@ export default function AdminDashboard() {
 
         <Panel
           title="Coffee Source Breakdown (Today)"
-          action="View report"
+          action={
+            <Link
+              href="/dashboard/reports"
+              className="text-[10px] font-medium text-[#16613e]"
+            >
+              View report
+            </Link>
+          }
         >
-          <div className="grid min-h-[245px] grid-cols-1 sm:grid-cols-[150px_1fr] items-center gap-2 px-4">
+          <div className="grid min-h-[245px] grid-cols-1 items-center gap-2 px-4 sm:grid-cols-[150px_1fr]">
             <div className="h-[160px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={sourceData}
-                    dataKey="value"
-                    innerRadius={42}
-                    outerRadius={66}
-                    strokeWidth={0}
-                    fill="#155f3d"
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              {sourceTotal > 0 ? (
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                >
+                  <PieChart>
+                    <Pie
+                      data={
+                        data.source_breakdown
+                      }
+                      dataKey="value"
+                      innerRadius={42}
+                      outerRadius={66}
+                      strokeWidth={0}
+                    >
+                      <Cell
+                        fill="#155f3d"
+                      />
+                      <Cell
+                        fill="#d7b98b"
+                      />
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex h-full items-center justify-center text-xs text-slate-400">
+                  No coffee today
+                </div>
+              )}
             </div>
 
-            <div className="space-y-5">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#155f3d]" />
-                  <p className="text-[10px] font-semibold text-[#344054]">
-                    From Agents
-                  </p>
-                </div>
+            <div className="space-y-4">
+              {data.source_breakdown.map(
+                (source, index) => {
+                  const percentage =
+                    sourceTotal > 0
+                      ? (
+                          (source.value /
+                            sourceTotal) *
+                          100
+                        ).toFixed(1)
+                      : "0.0";
 
-                <p className="ml-5 mt-1 text-[10px] text-[#374151]">
-                  2,240 KG (65.5%)
-                </p>
-              </div>
+                  return (
+                    <div
+                      key={
+                        source.name
+                      }
+                    >
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`h-2.5 w-2.5 rounded-full ${
+                            index === 0
+                              ? "bg-[#155f3d]"
+                              : "bg-[#d7b98b]"
+                          }`}
+                        />
 
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#d99a2b]" />
-                  <p className="text-[10px] font-semibold text-[#344054]">
-                    From Farmers
-                  </p>
-                </div>
+                        <span className="text-[10px] font-semibold text-slate-700">
+                          {
+                            source.name
+                          }
+                        </span>
+                      </div>
 
-                <p className="ml-5 mt-1 text-[10px] text-[#374151]">
-                  1,180 KG (34.5%)
-                </p>
-              </div>
+                      <p className="mt-1 text-sm font-semibold text-slate-950">
+                        {formatNumber(
+                          source.value,
+                        )}{" "}
+                        KG
+                      </p>
 
-              <div className="border-t border-[#e4bb7a] pt-3">
-                <div className="flex justify-between">
-                  <span className="text-[11px] font-semibold text-[#344054]">
-                    Total
-                  </span>
-
-                  <span className="text-[12px] font-semibold text-[#155f3d]">
-                    3,420 KG
-                  </span>
-                </div>
-              </div>
+                      <p className="text-[9px] text-slate-500">
+                        {percentage}%
+                      </p>
+                    </div>
+                  );
+                },
+              )}
             </div>
           </div>
         </Panel>
       </div>
 
-      <div className="grid gap-3 xl:grid-cols-[1.15fr_1fr_1fr]">
-        <Panel
-          title="Top Agent Performance (This Month)"
-          action="View full report"
-        >
-          <div className="w-full overflow-x-auto p-3">
-            <table className="min-w-[620px] w-full text-left text-[9px] text-[#344054]">
-              <thead className="bg-[#f6eddf] text-[#3b2c1b]">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
+        {[
+          {
+            label:
+              "Active Agents",
+            value:
+              data.operations
+                .active_agents,
+            suffix: "",
+            icon: UsersRound,
+          },
+          {
+            label:
+              "Farmers Served Today",
+            value:
+              data.operations
+                .farmers_served_today,
+            suffix: "",
+            icon: UsersRound,
+          },
+          {
+            label: "Trips Today",
+            value:
+              data.operations
+                .trips_today,
+            suffix: "",
+            icon: Truck,
+          },
+          {
+            label:
+              "Coffee in Store",
+            value:
+              data.operations
+                .store_stock_kg,
+            suffix: " KG",
+            icon: Warehouse,
+          },
+          {
+            label:
+              "Pending Approvals",
+            value:
+              data.operations
+                .pending_approvals,
+            suffix: "",
+            icon: HandCoins,
+          },
+        ].map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <div
+              key={item.label}
+              className="rounded-xl border border-[#eee4d6] bg-white p-4"
+            >
+              <div className="flex items-center gap-2 text-[#155f3d]">
+                <Icon size={16} />
+
+                <p className="text-[9px] font-semibold text-slate-500">
+                  {item.label}
+                </p>
+              </div>
+
+              <p className="mt-3 text-lg font-bold text-slate-950">
+                {formatNumber(
+                  item.value,
+                )}
+                {item.suffix}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+
+      <Panel
+        title="Top Coffee Agents"
+        action={
+          <Link
+            href="/dashboard/people/agents"
+            className="text-[10px] font-medium text-[#16613e]"
+          >
+            View agents
+          </Link>
+        }
+      >
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[680px] text-left">
+            <thead className="bg-[#faf7f1] text-[9px] uppercase tracking-wide text-slate-500">
+              <tr>
+                <th className="px-4 py-3">
+                  Agent
+                </th>
+
+                <th className="px-4 py-3">
+                  Coffee
+                </th>
+
+                <th className="px-4 py-3">
+                  Purchase Value
+                </th>
+
+                <th className="px-4 py-3">
+                  Collections
+                </th>
+              </tr>
+            </thead>
+
+            <tbody className="divide-y divide-slate-100">
+              {data.top_agents.length ? (
+                data.top_agents.map(
+                  (agent) => (
+                    <tr
+                      key={
+                        agent.agent_id
+                      }
+                    >
+                      <td className="px-4 py-3 text-[11px] font-semibold text-slate-800">
+                        {agent.name}
+                      </td>
+
+                      <td className="px-4 py-3 text-[11px] text-slate-600">
+                        {formatNumber(
+                          agent.quantity_kg,
+                        )}{" "}
+                        KG
+                      </td>
+
+                      <td className="px-4 py-3 text-[11px] text-slate-600">
+                        {formatNumber(
+                          agent.total_amount,
+                          0,
+                        )}{" "}
+                        RWF
+                      </td>
+
+                      <td className="px-4 py-3 text-[11px] text-slate-600">
+                        {
+                          agent.collections
+                        }
+                      </td>
+                    </tr>
+                  ),
+                )
+              ) : (
                 <tr>
-                  <th className="px-2 py-2">#</th>
-                  <th className="px-2 py-2">Agent Name</th>
-                  <th className="px-2 py-2">
-                    Coffee Collected
-                  </th>
-                  <th className="px-2 py-2">Amount (RWF)</th>
-                  <th className="px-2 py-2">Trips</th>
+                  <td
+                    colSpan={4}
+                    className="px-4 py-8 text-center text-xs text-slate-500"
+                  >
+                    No agent purchase
+                    data available yet.
+                  </td>
                 </tr>
-              </thead>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </Panel>
 
-              <tbody className="divide-y divide-gray-100">
-                {agents.map((agent, index) => (
-                  <tr key={index} className="text-[#475467]">
-                    <td className="px-2 py-2">
-                      {index + 1}
-                    </td>
-                    <td className="px-2 py-2">
-                      {agent[0]}
-                    </td>
-                    <td className="px-2 py-2">
-                      {agent[1]}
-                    </td>
-                    <td className="px-2 py-2">
-                      {agent[2]}
-                    </td>
-                    <td className="px-2 py-2">
-                      {agent[3]}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
-
-        <Panel title="Operational Summary (Today)">
-          <div className="space-y-3 p-4">
-            {[
-              ["Total Trips Completed", "7"],
-              ["Total Coffee Received", "3,850 KG"],
-              ["Total Coffee Purchased", "3,420 KG"],
-              ["Average Price (RWF / KG)", "2,550"],
-              ["Farmers Paid", "2,135,000 RWF"],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="flex items-center justify-between"
-              >
-                <span className="text-[10px] text-[#374151]">
-                  {label}
-                </span>
-
-                <span className="text-[11px] font-semibold text-gray-900">
-                  {value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel
-          title="Cash Summary"
-          action="View report"
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() =>
+            void refresh()
+          }
+          disabled={loading}
+          className="inline-flex items-center gap-2 rounded-lg border border-[#e6dbc9] bg-white px-3 py-2 text-[10px] font-semibold text-slate-600 hover:bg-[#faf7f1] disabled:opacity-50"
         >
-          <div className="p-4">
-            <div className="space-y-4">
-              <div className="flex justify-between text-[10px]">
-                <span className="font-medium text-[#475467]">
-                  Opening Cash (Today)
-                </span>
-                <span className="font-medium">
-                  16,250,000 RWF
-                </span>
-              </div>
+          <RefreshCw
+            size={14}
+            className={
+              loading
+                ? "animate-spin"
+                : ""
+            }
+          />
 
-              <div className="flex justify-between text-[10px]">
-                <span className="text-[#374151]">
-                  Total Cash In
-                </span>
-                <span className="font-medium text-[#167245]">
-                  18,325,000 RWF
-                </span>
-              </div>
-
-              <div className="flex justify-between text-[10px]">
-                <span className="text-[#374151]">
-                  Total Cash Out
-                </span>
-                <span className="font-medium text-red-500">
-                  10,015,000 RWF
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-5 border-t border-[#dba557] pt-4">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-[#344054]">
-                  Available Cash
-                </span>
-
-                <span className="text-[13px] font-bold text-[#15613d]">
-                  24,560,000 RWF
-                </span>
-              </div>
-            </div>
-          </div>
-        </Panel>
+          Refresh Dashboard
+        </button>
       </div>
     </div>
   );
+}
+
+export default function AdminDashboard() {
+  const {
+    user,
+    loading,
+  } = useCurrentUser();
+
+  if (loading) {
+    return <DashboardSkeleton />;
+  }
+
+  if (
+    user?.role ===
+    "accountant"
+  ) {
+    return <AccountantDashboard />;
+  }
+
+  return <AdminLiveDashboard />;
 }

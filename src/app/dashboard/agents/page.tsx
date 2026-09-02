@@ -1,10 +1,9 @@
-import DashboardPage from "@/components/shared/dashboard-page";
+import {
+  redirect,
+} from "next/navigation";
 
-export default function AgentsPage() {
-  return (
-    <DashboardPage
-      title="Agents"
-      description="Manage coffee agents, cash balances, collections, deliveries and performance."
-    />
+export default function AgentsRedirectPage() {
+  redirect(
+    "/dashboard/people/agents"
   );
 }

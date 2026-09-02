@@ -1,10 +1,7 @@
-import DashboardPage from "@/components/shared/dashboard-page";
+import ReportManagement from "@/components/reports/report-management";
 
 export default function ReportsPage() {
   return (
-    <DashboardPage
-      title="Reports"
-      description="View coffee, finance, agent, farmer, trip and store reports."
-    />
+    <ReportManagement />
   );
 }

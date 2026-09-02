@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Bell,
   ChevronDown,
   LogOut,
   Menu,
@@ -26,6 +25,8 @@ import {
 import {
   useDashboardSidebar,
 } from "@/components/layout/dashboard-sidebar-context";
+
+import NotificationBell from "@/components/notifications/notification-bell";
 
 import {
   logout,
@@ -74,6 +75,54 @@ function getPageTitle(
 
   if (
     pathname.startsWith(
+      "/dashboard/coffee-operations/coffee-purchases",
+    )
+  ) {
+    return "Coffee Purchases";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/coffee-operations/direct-farmer-deliveries",
+    )
+  ) {
+    return "Direct Farmer Deliveries";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/coffee-operations/agent-collections",
+    )
+  ) {
+    return "Agent Collections";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/coffee-operations/field-weighings",
+    )
+  ) {
+    return "Field Weighing";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/coffee-operations/factory-receptions",
+    )
+  ) {
+    return "Factory Reception";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/coffee-operations/coffee-lots",
+    )
+  ) {
+    return "Coffee Lots / Batches";
+  }
+
+  if (
+    pathname.startsWith(
       "/dashboard/coffee-operations",
     )
   ) {
@@ -82,10 +131,42 @@ function getPageTitle(
 
   if (
     pathname.startsWith(
+      "/dashboard/people/agents",
+    )
+  ) {
+    return "Agents Management";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/people/farmers",
+    )
+  ) {
+    return "Farmers Management";
+  }
+
+  if (
+    pathname.startsWith(
       "/dashboard/people",
     )
   ) {
     return "People";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/finance/cash-allocations",
+    )
+  ) {
+    return "Cash Allocations";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/finance/agent-wallets",
+    )
+  ) {
+    return "Agent Cash Wallets";
   }
 
   if (
@@ -118,6 +199,23 @@ function getPageTitle(
     )
   ) {
     return "Approvals";
+  }
+
+
+  if (
+    pathname.startsWith(
+      "/dashboard/notifications",
+    )
+  ) {
+    return "Notifications";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/audit-trail",
+    )
+  ) {
+    return "Audit Trail";
   }
 
   if (
@@ -244,17 +342,7 @@ export default function DashboardTopbar() {
 
         {/* RIGHT SIDE */}
         <div className="ml-auto flex items-center gap-4">
-          <button
-            type="button"
-            className="relative flex h-10 w-10 items-center justify-center rounded-lg text-[#243b55] transition hover:bg-[#faf5ed]"
-            aria-label="Notifications"
-          >
-            <Bell size={21} />
-
-            <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#a9680b] px-1 text-[10px] font-bold text-white">
-              3
-            </span>
-          </button>
+          <NotificationBell />
 
           <div className="relative">
             <button

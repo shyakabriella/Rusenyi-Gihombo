@@ -7,21 +7,19 @@ import {
   Users,
 } from "lucide-react";
 
-import DashboardTopbar from "@/components/layout/dashboard-topbar";
-
 const sections = [
   {
     title: "Agents",
     description:
       "Manage coffee collection Agents, assigned areas, cash position and performance.",
-    href: "/dashboard/agents",
+    href: "/dashboard/people/agents",
     icon: Users,
   },
   {
     title: "Farmers",
     description:
       "Manage farmer profiles, locations, coffee deliveries and payment history.",
-    href: "/dashboard/farmers",
+    href: "/dashboard/people/farmers",
     icon: Tractor,
   },
   {
@@ -43,9 +41,7 @@ const sections = [
 export default function PeoplePage() {
   return (
     <div className="min-h-full">
-      <DashboardTopbar title="People" />
-
-      <div className="p-5 lg:p-7">
+<div className="p-5 lg:p-7">
         <div className="mb-6">
           <h2 className="text-xl font-semibold">
             People Management

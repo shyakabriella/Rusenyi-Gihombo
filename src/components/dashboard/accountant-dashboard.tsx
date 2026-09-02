@@ -1,148 +1,58 @@
 "use client";
 
+import Link from "next/link";
+
 import {
+  Banknote,
   BadgeDollarSign,
-  CircleDollarSign,
   Coffee,
   HandCoins,
-  Landmark,
-  PackageCheck,
   ReceiptText,
-  Users,
+  RefreshCw,
 } from "lucide-react";
 
 import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+  useDashboardOverview,
+} from "@/hooks/use-dashboard-overview";
 
-const stats = [
-  {
-    label: "Coffee Purchased Today",
-    value: "3,420",
-    suffix: "KG",
-    growth: "8.4%",
-    icon: PackageCheck,
-  },
-  {
-    label: "Coffee Received Today",
-    value: "3,850",
-    suffix: "KG",
-    growth: "12.5%",
-    icon: Coffee,
-  },
-  {
-    label: "Money Used Today",
-    value: "8,745,000",
-    suffix: "RWF",
-    growth: "10.3%",
-    icon: HandCoins,
-  },
-  {
-    label: "Available Cash",
-    value: "24,560,000",
-    suffix: "RWF",
-    growth: "5.7%",
-    icon: BadgeDollarSign,
-  },
-];
+function money(
+  value: number,
+) {
+  return new Intl.NumberFormat(
+    "en-US",
+    {
+      maximumFractionDigits: 0,
+    },
+  ).format(value);
+}
 
-const weeklyPurchases = [
-  { day: "Sat", kg: 2260 },
-  { day: "Sun", kg: 2780 },
-  { day: "Mon", kg: 2940 },
-  { day: "Tue", kg: 3710 },
-  { day: "Wed", kg: 3540 },
-  { day: "Thu", kg: 3150 },
-  { day: "Fri", kg: 3420 },
-];
-
-const sourceData = [
-  {
-    name: "Agents",
-    value: 2240,
-  },
-  {
-    name: "Direct Farmers",
-    value: 1180,
-  },
-];
-
-const financeActivities = [
-  {
-    title: "Farmer payment recorded",
-    description:
-      "2,135,000 RWF paid to 23 farmers.",
-    time: "09:20 AM",
-    icon: ReceiptText,
-  },
-  {
-    title: "Agent funds allocated",
-    description:
-      "1,500,000 RWF allocated to a coffee collection Agent.",
-    time: "09:05 AM",
-    icon: Users,
-  },
-  {
-    title: "Coffee purchase recorded",
-    description:
-      "620 KG coffee purchase submitted by an Agent.",
-    time: "08:45 AM",
-    icon: Coffee,
-  },
-  {
-    title: "Operational expense recorded",
-    description:
-      "Fuel expense of 185,000 RWF recorded.",
-    time: "08:20 AM",
-    icon: CircleDollarSign,
-  },
-];
-
-function StatCard({
-  item,
+function FinanceCard({
+  label,
+  value,
+  icon: Icon,
 }: {
-  item: (typeof stats)[number];
+  label: string;
+  value: number;
+  icon: typeof Banknote;
 }) {
-  const Icon = item.icon;
-
   return (
-    <div className="min-w-0 rounded-xl border border-[#eee4d6] bg-white p-4 shadow-[0_2px_10px_rgba(64,43,16,0.04)]">
+    <div className="rounded-xl border border-[#eee4d6] bg-white p-4 shadow-[0_2px_10px_rgba(64,43,16,0.04)]">
       <div className="flex items-start gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f6ead8] text-[#155f3d]">
-          <Icon
-            size={21}
-            strokeWidth={1.8}
-          />
+          <Icon size={20} />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-medium text-[#28313f]">
-            {item.label}
+        <div className="min-w-0">
+          <p className="text-[11px] font-medium text-slate-600">
+            {label}
           </p>
 
-          <div className="mt-2 flex items-end justify-between gap-2">
-            <p className="text-[19px] font-semibold tracking-tight text-gray-950">
-              {item.value}
-            </p>
+          <p className="mt-2 truncate text-[19px] font-semibold text-slate-950">
+            {money(value)}
+          </p>
 
-            <span className="pb-0.5 text-[9px] font-medium text-[#4b5563]">
-              {item.suffix}
-            </span>
-          </div>
-
-          <p className="mt-2 text-[10px] text-[#4b5563]">
-            <span className="font-medium text-[#0a6a3f]">
-              ↑ {item.growth}
-            </span>{" "}
-            vs yesterday
+          <p className="mt-1 text-[9px] text-slate-500">
+            RWF
           </p>
         </div>
       </div>
@@ -150,372 +60,240 @@ function StatCard({
   );
 }
 
-function Panel({
-  title,
-  action,
-  children,
-}: {
-  title: string;
-  action?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="rounded-xl border border-[#eee4d6] bg-white shadow-[0_2px_10px_rgba(64,43,16,0.035)]">
-      <div className="flex h-12 items-center justify-between border-b border-[#f1e8dc] px-4">
-        <h2 className="font-serif text-[13px] font-semibold text-gray-900">
-          {title}
-        </h2>
-
-        {action && (
-          <button
-            type="button"
-            className="text-[10px] font-medium text-[#16613e]"
-          >
-            {action}
-          </button>
-        )}
-      </div>
-
-      {children}
-    </section>
-  );
-}
-
 export default function AccountantDashboard() {
-  return (
-    <div className="w-full min-w-0 space-y-3 overflow-hidden">
-      {/* 4 Accountant KPIs */}
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useDashboardOverview();
+
+  if (
+    loading &&
+    !data
+  ) {
+    return (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((item) => (
-          <StatCard
-            key={item.label}
-            item={item}
+        {Array.from({
+          length: 4,
+        }).map((_, index) => (
+          <div
+            key={index}
+            className="h-[105px] animate-pulse rounded-xl border border-[#eee4d6] bg-white"
           />
         ))}
       </div>
+    );
+  }
 
-      {/* Coffee + finance overview */}
-      <div className="grid gap-3 xl:grid-cols-[1.4fr_1fr_1fr]">
-        <Panel
-          title="Coffee Purchased Over the Week (KG)"
-          action="View report"
+  if (!data) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-5">
+        <p className="text-sm text-red-700">
+          {error ||
+            "Unable to load finance dashboard."}
+        </p>
+
+        <button
+          type="button"
+          onClick={() =>
+            void refresh()
+          }
+          className="mt-4 rounded-lg bg-slate-950 px-4 py-2 text-xs font-semibold text-white"
         >
-          <div className="h-[250px] p-4">
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <LineChart
-                data={weeklyPurchases}
-              >
-                <CartesianGrid
-                  vertical={false}
-                  stroke="#eee9e1"
-                />
+          Try Again
+        </button>
+      </div>
+    );
+  }
 
-                <XAxis
-                  dataKey="day"
-                  tick={{
-                    fontSize: 9,
-                  }}
-                  axisLine={false}
-                  tickLine={false}
-                />
+  return (
+    <div className="space-y-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <FinanceCard
+          label="Money Used Today"
+          value={
+            data.cards
+              .money_used_today
+              .value
+          }
+          icon={HandCoins}
+        />
 
-                <YAxis
-                  tick={{
-                    fontSize: 9,
-                  }}
-                  axisLine={false}
-                  tickLine={false}
-                />
+        <FinanceCard
+          label="Available Cash"
+          value={
+            data.finance
+              .available_operational_cash
+          }
+          icon={
+            BadgeDollarSign
+          }
+        />
 
-                <Tooltip />
+        <FinanceCard
+          label="Agent Wallet Balance"
+          value={
+            data.finance
+              .agent_wallet_balance
+          }
+          icon={Banknote}
+        />
 
-                <Line
-                  type="monotone"
-                  dataKey="kg"
-                  stroke="#145b38"
-                  strokeWidth={2}
-                  dot={{
-                    fill: "#145b38",
-                    r: 4,
-                    strokeWidth: 0,
-                  }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </Panel>
-
-        <Panel
-          title="Coffee Purchase Source"
-          action="View report"
-        >
-          <div className="flex min-h-[250px] flex-col items-center justify-center px-4">
-            <div className="h-[145px] w-full">
-              <ResponsiveContainer
-                width="100%"
-                height="100%"
-              >
-                <PieChart>
-                  <Pie
-                    data={sourceData}
-                    dataKey="value"
-                    innerRadius={38}
-                    outerRadius={62}
-                    strokeWidth={0}
-                    fill="#155f3d"
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="w-full space-y-2">
-              <div className="flex items-center justify-between text-[10px]">
-                <span>
-                  From Agents
-                </span>
-
-                <strong>
-                  2,240 KG
-                </strong>
-              </div>
-
-              <div className="flex items-center justify-between text-[10px]">
-                <span>
-                  Direct Farmers
-                </span>
-
-                <strong>
-                  1,180 KG
-                </strong>
-              </div>
-
-              <div className="flex items-center justify-between border-t border-[#e4bb7a] pt-2 text-[11px]">
-                <strong>Total</strong>
-
-                <strong className="text-[#155f3d]">
-                  3,420 KG
-                </strong>
-              </div>
-            </div>
-          </div>
-        </Panel>
-
-        <Panel
-          title="Cash Summary"
-          action="View finance"
-        >
-          <div className="space-y-4 p-4">
-            <div className="flex justify-between text-[10px]">
-              <span className="text-[#475467]">
-                Opening Cash
-              </span>
-
-              <strong>
-                16,250,000 RWF
-              </strong>
-            </div>
-
-            <div className="flex justify-between text-[10px]">
-              <span className="text-[#475467]">
-                Cash Received
-              </span>
-
-              <strong className="text-emerald-700">
-                18,325,000 RWF
-              </strong>
-            </div>
-
-            <div className="flex justify-between text-[10px]">
-              <span className="text-[#475467]">
-                Cash Used
-              </span>
-
-              <strong className="text-red-500">
-                10,015,000 RWF
-              </strong>
-            </div>
-
-            <div className="border-t border-[#dba557] pt-4">
-              <div className="flex justify-between">
-                <strong className="text-[11px]">
-                  Available Cash
-                </strong>
-
-                <strong className="text-[13px] text-[#15613d]">
-                  24,560,000 RWF
-                </strong>
-              </div>
-            </div>
-          </div>
-        </Panel>
+        <FinanceCard
+          label="Petty Cash Balance"
+          value={
+            data.finance
+              .petty_cash_balance
+          }
+          icon={ReceiptText}
+        />
       </div>
 
-      {/* Finance-specific information */}
-      <div className="grid gap-3 xl:grid-cols-[1.15fr_1fr_1fr]">
-        <Panel
-          title="Recent Coffee & Finance Activities"
-          action="View all"
-        >
-          <div className="divide-y divide-gray-100 px-3">
-            {financeActivities.map(
-              (activity) => {
-                const Icon =
-                  activity.icon;
+      <div className="grid gap-3 lg:grid-cols-2">
+        <section className="rounded-xl border border-[#eee4d6] bg-white">
+          <div className="border-b border-[#f1e8dc] px-4 py-3">
+            <h2 className="font-serif text-[13px] font-semibold text-slate-900">
+              Today&apos;s Spending
+            </h2>
+          </div>
 
-                return (
-                  <div
-                    key={`${activity.title}-${activity.time}`}
-                    className="flex items-start gap-3 py-3"
-                  >
-                    <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#edf5ee] text-[#155f3d]">
-                      <Icon
-                        size={15}
-                      />
-                    </div>
+          <div className="divide-y divide-slate-100 px-4">
+            {[
+              [
+                "Coffee Purchases",
+                data.finance
+                  .coffee_purchase_spending_today,
+              ],
+              [
+                "Direct Farmer Payments",
+                data.finance
+                  .direct_farmer_payments_today,
+              ],
+              [
+                "Operating Expenses",
+                data.finance
+                  .expenses_today,
+              ],
+            ].map(
+              ([label, value]) => (
+                <div
+                  key={
+                    label as string
+                  }
+                  className="flex items-center justify-between gap-4 py-4"
+                >
+                  <div className="flex items-center gap-2">
+                    <Coffee
+                      size={15}
+                      className="text-[#155f3d]"
+                    />
 
-                    <div className="min-w-0 flex-1">
-                      <div className="flex justify-between gap-2">
-                        <p className="truncate text-[10px] font-semibold text-gray-800">
-                          {
-                            activity.title
-                          }
-                        </p>
-
-                        <span className="shrink-0 text-[9px] text-[#667085]">
-                          {
-                            activity.time
-                          }
-                        </span>
-                      </div>
-
-                      <p className="mt-1 text-[9px] text-[#5b6470]">
-                        {
-                          activity.description
-                        }
-                      </p>
-                    </div>
+                    <span className="text-xs font-medium text-slate-600">
+                      {label}
+                    </span>
                   </div>
-                );
-              },
+
+                  <span className="text-xs font-bold text-slate-950">
+                    {money(
+                      Number(value),
+                    )}{" "}
+                    RWF
+                  </span>
+                </div>
+              ),
             )}
           </div>
-        </Panel>
+        </section>
 
-        <Panel
-          title="Agent Funds Summary"
-          action="View finance"
-        >
-          <div className="space-y-4 p-4">
-            <div className="flex items-center gap-3 rounded-lg bg-[#faf7f2] p-3">
-              <Landmark
-                size={18}
-                className="text-[#155f3d]"
-              />
+        <section className="rounded-xl border border-[#eee4d6] bg-white">
+          <div className="border-b border-[#f1e8dc] px-4 py-3">
+            <h2 className="font-serif text-[13px] font-semibold text-slate-900">
+              Finance Attention
+            </h2>
+          </div>
 
-              <div className="flex-1">
-                <p className="text-[10px] text-slate-500">
-                  Allocated to Agents
-                </p>
-
-                <p className="mt-1 text-sm font-semibold">
-                  12,500,000 RWF
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-between text-[10px]">
-              <span>
-                Used by Agents
+          <div className="space-y-3 p-4">
+            <div className="flex items-center justify-between rounded-lg bg-[#faf7f1] px-4 py-3">
+              <span className="text-xs font-medium text-slate-600">
+                Pending Approvals
               </span>
 
-              <strong>
-                8,745,000 RWF
-              </strong>
+              <span className="text-lg font-bold text-slate-950">
+                {
+                  data.operations
+                    .pending_approvals
+                }
+              </span>
             </div>
 
-            <div className="flex justify-between text-[10px]">
-              <span>
-                Remaining with Agents
+            <div className="flex items-center justify-between rounded-lg bg-[#faf7f1] px-4 py-3">
+              <span className="text-xs font-medium text-slate-600">
+                Coffee Purchased Today
               </span>
 
-              <strong className="text-[#155f3d]">
-                3,755,000 RWF
-              </strong>
+              <span className="text-sm font-bold text-slate-950">
+                {money(
+                  data.cards
+                    .coffee_purchased_today
+                    .value,
+                )}{" "}
+                KG
+              </span>
             </div>
 
-            <div className="flex justify-between text-[10px]">
-              <span>
-                Agents with Outstanding Cash
-              </span>
+            <div className="flex flex-wrap gap-2 pt-2">
+              <Link
+                href="/dashboard/finance/approvals"
+                className="rounded-lg bg-[#155f3d] px-4 py-2 text-[10px] font-semibold text-white"
+              >
+                Approvals
+              </Link>
 
-              <strong>
-                6
-              </strong>
+              <Link
+                href="/dashboard/finance/expenses"
+                className="rounded-lg border border-[#e6dbc9] px-4 py-2 text-[10px] font-semibold text-slate-700"
+              >
+                Expenses
+              </Link>
+
+              <Link
+                href="/dashboard/reports"
+                className="rounded-lg border border-[#e6dbc9] px-4 py-2 text-[10px] font-semibold text-slate-700"
+              >
+                Reports
+              </Link>
             </div>
           </div>
-        </Panel>
+        </section>
+      </div>
 
-        <Panel
-          title="Farmer Payments Today"
-          action="View report"
+      {error ? (
+        <p className="text-xs text-amber-700">
+          {error}
+        </p>
+      ) : null}
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() =>
+            void refresh()
+          }
+          disabled={loading}
+          className="inline-flex items-center gap-2 rounded-lg border border-[#e6dbc9] bg-white px-3 py-2 text-[10px] font-semibold text-slate-600"
         >
-          <div className="space-y-4 p-4">
-            <div className="flex justify-between text-[10px]">
-              <span>
-                Farmers Paid
-              </span>
+          <RefreshCw
+            size={14}
+            className={
+              loading
+                ? "animate-spin"
+                : ""
+            }
+          />
 
-              <strong>
-                23
-              </strong>
-            </div>
-
-            <div className="flex justify-between text-[10px]">
-              <span>
-                Total Paid
-              </span>
-
-              <strong className="text-[#155f3d]">
-                2,135,000 RWF
-              </strong>
-            </div>
-
-            <div className="flex justify-between text-[10px]">
-              <span>
-                Pending Payments
-              </span>
-
-              <strong>
-                4
-              </strong>
-            </div>
-
-            <div className="flex justify-between text-[10px]">
-              <span>
-                Pending Amount
-              </span>
-
-              <strong className="text-[#a76016]">
-                420,000 RWF
-              </strong>
-            </div>
-
-            <div className="border-t border-[#e5ded4] pt-3">
-              <div className="flex justify-between text-[10px]">
-                <span>
-                  Average Buying Price
-                </span>
-
-                <strong>
-                  2,550 RWF/KG
-                </strong>
-              </div>
-            </div>
-          </div>
-        </Panel>
+          Refresh Dashboard
+        </button>
       </div>
     </div>
   );

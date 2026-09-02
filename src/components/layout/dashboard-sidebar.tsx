@@ -72,6 +72,12 @@ const menuItems = [
     icon: ChartNoAxesColumnIncreasing,
   },
   {
+    label: "Audit Trail",
+    href: "/dashboard/audit-trail",
+    icon: Settings,
+  },
+
+  {
     label: "User Management",
     href: "/dashboard/users",
     icon: UserCog,

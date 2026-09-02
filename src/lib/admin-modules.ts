@@ -21,6 +21,9 @@ import {
   Warehouse,
   Wheat,
   Wrench,
+  ArrowLeftRight,
+  Cog,
+  BarChart3,
 } from "lucide-react";
 
 export const coffeeOperationLinks = [
@@ -28,14 +31,14 @@ export const coffeeOperationLinks = [
     title: "Coffee Purchases",
     description:
       "View all coffee purchases, quantities, price per kg, total amount and payment status.",
-    href: "/dashboard/coffee-operations/purchases",
+    href: "/dashboard/coffee-operations/coffee-purchases",
     icon: ShoppingBasket,
   },
   {
-    title: "Farmer Deliveries",
+    title: "Direct Farmer Deliveries",
     description:
       "Monitor farmers delivering coffee directly to Gihombo.",
-    href: "/dashboard/coffee-operations/farmer-deliveries",
+    href: "/dashboard/coffee-operations/direct-farmer-deliveries",
     icon: Wheat,
   },
   {
@@ -46,10 +49,17 @@ export const coffeeOperationLinks = [
     icon: UsersRound,
   },
   {
+    title: "Field Weighing",
+    description:
+      "Monitor field weight recorded by Balance Officers and compare it with Agent Collection quantity.",
+    href: "/dashboard/coffee-operations/field-weighings",
+    icon: Scale,
+  },
+  {
     title: "Factory Receipts",
     description:
       "Track coffee arriving at Gihombo and compare field and factory weights.",
-    href: "/dashboard/coffee-operations/factory-receipts",
+    href: "/dashboard/coffee-operations/factory-receptions",
     icon: Factory,
   },
   {
@@ -58,6 +68,35 @@ export const coffeeOperationLinks = [
       "Track coffee batches, source, weight, processing stage and storage.",
     href: "/dashboard/coffee-operations/coffee-lots",
     icon: PackageCheck,
+  },
+  {
+    title: "Store / Inventory",
+    description:
+      "Receive Coffee Lots into storage and monitor stock quantity, bags and storage locations.",
+    href: "/dashboard/coffee-operations/store-inventories",
+    icon: PackageCheck,
+  },
+  {
+    title: "Stock Movements",
+    description:
+      "Track inventory increases, decreases, adjustments, transfers and stock reversals.",
+    href: "/dashboard/coffee-operations/stock-movements",
+    icon: ArrowLeftRight,
+  },
+  {
+    title: "Coffee Processing",
+    description:
+      "Manage processing batches and trace coffee issued from Store Inventory into processing.",
+    href: "/dashboard/coffee-operations/processing-batches",
+    icon: Cog,
+  },
+
+  {
+    title: "Processing Yield & Loss",
+    description:
+      "Monitor processing input, output, yield percentage, loss and generated output Coffee Lots.",
+    href: "/dashboard/coffee-operations/processing-yields",
+    icon: BarChart3,
   },
 ];
 
@@ -68,6 +107,13 @@ export const peopleLinks = [
       "Manage agent profiles, cash, collections, deliveries and performance.",
     href: "/dashboard/people/agents",
     icon: UsersRound,
+  },
+  {
+    title: "Drivers & Vehicles",
+    description:
+      "Manage driver profiles, vehicle availability, capacity and driver assignments.",
+    href: "/dashboard/people/transport",
+    icon: Truck,
   },
   {
     title: "Farmers",
@@ -104,7 +150,7 @@ export const financeLinks = [
     title: "Cash Allocation",
     description:
       "Track money allocated to the Accountant.",
-    href: "/dashboard/finance/cash-allocation",
+    href: "/dashboard/finance/cash-allocations",
     icon: Banknote,
   },
   {
@@ -127,6 +173,22 @@ export const financeLinks = [
       "Manage petty cash requests, approvals and returned balances.",
     href: "/dashboard/finance/petty-cash",
     icon: ClipboardCheck,
+  },
+
+  {
+    title: "Payroll",
+    description:
+      "Prepare monthly salaries, process Payroll and record employee salary payments.",
+    href: "/dashboard/finance/payroll",
+    icon: UsersRound,
+  },
+
+  {
+    title: "Approvals",
+    description:
+      "Review financial requests, approve or reject actions and track authorization history.",
+    href: "/dashboard/finance/approvals",
+    icon: ShieldCheck,
   },
   {
     title: "Expenses",

@@ -1,10 +1,5 @@
-import DashboardPage from "@/components/shared/dashboard-page";
+import { redirect } from "next/navigation";
 
-export default function FarmersPage() {
-  return (
-    <DashboardPage
-      title="Farmers"
-      description="Manage registered farmers, coffee deliveries and farmer payment information."
-    />
-  );
+export default function FarmersRedirectPage() {
+  redirect("/dashboard/people/farmers");
 }
