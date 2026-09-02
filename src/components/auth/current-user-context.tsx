@@ -38,6 +38,7 @@ export const roleLabels: Record<
   agent: "Agent",
   driver: "Driver",
   store: "Store Officer",
+  worker: "Worker",
 };
 
 export function getUserInitials(

@@ -147,6 +147,22 @@ function getPageTitle(
 
   if (
     pathname.startsWith(
+      "/dashboard/people/drivers",
+    )
+  ) {
+    return "Drivers";
+  }
+
+  if (
+    pathname.startsWith(
+      "/dashboard/people/workers",
+    )
+  ) {
+    return "Workers";
+  }
+
+  if (
+    pathname.startsWith(
       "/dashboard/people",
     )
   ) {

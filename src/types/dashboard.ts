@@ -73,4 +73,34 @@ export type DashboardOverview = {
   source_breakdown: DashboardSourceItem[];
   recent_activities: DashboardActivity[];
   top_agents: DashboardTopAgent[];
+  coffee_operations: CoffeeOperationsOverview;
+};
+
+export type CoffeeOperationMetric = {
+  value: number;
+  unit: string;
+  note: string;
+};
+
+export type CoffeeOperationsOverview = {
+  coffee_purchases: CoffeeOperationMetric;
+  direct_farmer_deliveries: CoffeeOperationMetric;
+  agent_collections: CoffeeOperationMetric;
+  field_weighings: CoffeeOperationMetric;
+  collection_trips: CoffeeOperationMetric;
+  factory_receptions: CoffeeOperationMetric;
+  weight_reconciliations: CoffeeOperationMetric;
+  coffee_lots: CoffeeOperationMetric;
+  store_inventories: CoffeeOperationMetric;
+  stock_movements: CoffeeOperationMetric;
+  processing_batches: CoffeeOperationMetric;
+  processing_yield: CoffeeOperationMetric;
+
+  flow: {
+    purchased_kg: number;
+    collected: number;
+    transported_kg: number;
+    factory_received_kg: number;
+    stored_kg: number;
+  };
 };

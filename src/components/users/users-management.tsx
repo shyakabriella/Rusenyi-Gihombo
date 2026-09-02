@@ -79,6 +79,10 @@ const roles: Array<{
     value: "store",
     label: "Store Officer",
   },
+  {
+    value: "worker",
+    label: "Worker",
+  },
 ];
 
 const emptyCreateForm: CreateUserPayload = {

@@ -7,6 +7,12 @@ export const metadata: Metadata = {
     template: "%s | Gihombo CWS",
   },
   description: "Gihombo Coffee Washing Station Management System",
+
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

@@ -4,7 +4,8 @@ export type UserRole =
   | "balance"
   | "agent"
   | "driver"
-  | "store";
+  | "store"
+  | "worker";
 
 export type UserStatus =
   | "active"
