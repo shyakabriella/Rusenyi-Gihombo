@@ -271,7 +271,7 @@ export default function WorkerManagement() {
                 )
               }
               placeholder="Search name, phone, email, National ID..."
-              className="h-10 w-full rounded-lg border border-slate-300 pl-10 pr-3 text-sm outline-none focus:border-[#b88a45]"
+              className="h-10 w-full rounded-lg border border-slate-400 bg-white pl-10 pr-3 text-sm font-medium text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-2 focus:ring-[#b88a45]/15"
             />
           </div>
 
@@ -280,7 +280,7 @@ export default function WorkerManagement() {
             onClick={() =>
               void load()
             }
-            className="inline-flex items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold"
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-slate-400 bg-white px-4 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-[#b88a45] hover:bg-[#faf7f1] hover:text-[#075b38]"
           >
             <RefreshCw
               size={16}
@@ -480,6 +480,8 @@ export default function WorkerManagement() {
                     false,
                   )
                 }
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                aria-label="Close"
               >
                 <X
                   size={20}
@@ -509,7 +511,7 @@ export default function WorkerManagement() {
                           .value,
                     })
                   }
-                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                  className="h-11 w-full rounded-lg border border-slate-400 bg-white px-3 text-sm font-medium text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-2 focus:ring-[#b88a45]/15"
                 />
               </Field>
 
@@ -530,7 +532,7 @@ export default function WorkerManagement() {
                           .value,
                     })
                   }
-                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                  className="h-11 w-full rounded-lg border border-slate-400 bg-white px-3 text-sm font-medium text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-2 focus:ring-[#b88a45]/15"
                 />
               </Field>
 
@@ -552,7 +554,7 @@ export default function WorkerManagement() {
                           .value,
                     })
                   }
-                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                  className="h-11 w-full rounded-lg border border-slate-400 bg-white px-3 text-sm font-medium text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-2 focus:ring-[#b88a45]/15"
                 />
               </Field>
 
@@ -573,7 +575,7 @@ export default function WorkerManagement() {
                           .value,
                     })
                   }
-                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                  className="h-11 w-full rounded-lg border border-slate-400 bg-white px-3 text-sm font-medium text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-2 focus:ring-[#b88a45]/15"
                 />
               </Field>
             </div>
@@ -586,7 +588,7 @@ export default function WorkerManagement() {
                     false,
                   )
                 }
-                className="rounded-lg border px-4 py-2 text-sm"
+                className="rounded-lg border border-slate-400 bg-white px-4 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-100"
               >
                 Cancel
               </button>
@@ -595,7 +597,7 @@ export default function WorkerManagement() {
                 disabled={
                   saving
                 }
-                className="rounded-lg bg-[#075b38] px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                className="rounded-lg bg-[#075b38] px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[#064a2e] disabled:cursor-not-allowed disabled:bg-slate-400 disabled:text-white"
               >
                 {saving
                   ? "Creating..."
@@ -629,7 +631,7 @@ function Field({
             *
           </span>
         ) : (
-          <span className="ml-1 font-normal text-slate-400">
+          <span className="ml-1 font-medium text-slate-600">
             (optional)
           </span>
         )}
