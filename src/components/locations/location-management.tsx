@@ -104,7 +104,10 @@ export default function LocationManagement() {
           search,
           status,
           page,
-          per_page: 20,
+          per_page:
+            tab === "districts"
+              ? 50
+              : 20,
         };
 
         let response;
