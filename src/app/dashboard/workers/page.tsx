@@ -1,9 +1,7 @@
-import {
-  redirect,
-} from "next/navigation";
+import WorkerManagement from "@/components/workers/worker-management";
 
-export default function WorkersRedirectPage() {
-  redirect(
-    "/dashboard/people/workers",
+export default function WorkersPage() {
+  return (
+    <WorkerManagement />
   );
 }

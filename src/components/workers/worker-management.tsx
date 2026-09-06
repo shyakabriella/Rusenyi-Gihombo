@@ -2,93 +2,141 @@
 
 import {
   FormEvent,
+  ReactNode,
   useCallback,
   useEffect,
   useState,
 } from "react";
 
-import Link from "next/link";
-
 import {
   CirclePlus,
   RefreshCw,
   Search,
+  UserRound,
   X,
 } from "lucide-react";
 
 import {
-  createUser,
-  getUsers,
-  updateUserStatus,
-} from "@/services/user-service";
+  createWorker,
+  getWorkers,
+  updateWorkerStatus,
+} from "@/services/worker-service";
 
 import type {
-  User,
-} from "@/types/user";
+  Worker,
+} from "@/types/worker";
 
 const emptyForm = {
   name: "",
-  email: "",
   phone: "",
+  email: "",
+  national_id: "",
 };
 
 export default function WorkerManagement() {
-  const [workers, setWorkers] =
-    useState<User[]>([]);
+  const [
+    workers,
+    setWorkers,
+  ] =
+    useState<Worker[]>(
+      [],
+    );
 
-  const [search, setSearch] =
+  const [
+    search,
+    setSearch,
+  ] =
     useState("");
 
-  const [loading, setLoading] =
+  const [
+    loading,
+    setLoading,
+  ] =
     useState(true);
 
-  const [saving, setSaving] =
+  const [
+    saving,
+    setSaving,
+  ] =
     useState(false);
 
-  const [error, setError] =
+  const [
+    error,
+    setError,
+  ] =
     useState("");
 
-  const [message, setMessage] =
+  const [
+    message,
+    setMessage,
+  ] =
     useState("");
 
-  const [modalOpen, setModalOpen] =
+  const [
+    modalOpen,
+    setModalOpen,
+  ] =
     useState(false);
 
-  const [form, setForm] =
-    useState(emptyForm);
+  const [
+    form,
+    setForm,
+  ] =
+    useState(
+      emptyForm,
+    );
 
   const load =
-    useCallback(async () => {
-      setLoading(true);
-      setError("");
+    useCallback(
+      async () => {
+        setLoading(true);
+        setError("");
 
-      try {
-        const result =
-          await getUsers({
-            role: "worker",
-            search:
-              search ||
-              undefined,
-            per_page: 100,
-          });
+        try {
+          const result =
+            await getWorkers({
+              search:
+                search ||
+                undefined,
 
-        setWorkers(
-          result.users ?? [],
-        );
-      } catch (requestError) {
-        setError(
+              per_page: 100,
+            });
+
+          setWorkers(
+            result.workers ??
+              [],
+          );
+        } catch (
           requestError
-            instanceof Error
-            ? requestError.message
-            : "Unable to load Workers.",
-        );
-      } finally {
-        setLoading(false);
-      }
-    }, [search]);
+        ) {
+          setError(
+            requestError
+              instanceof Error
+              ? requestError.message
+              : "Unable to load Workers.",
+          );
+        } finally {
+          setLoading(
+            false,
+          );
+        }
+      },
+      [search],
+    );
 
   useEffect(() => {
-    void load();
+    const timer =
+      window.setTimeout(
+        () => {
+          void load();
+        },
+        300,
+      );
+
+    return () =>
+      window.clearTimeout(
+        timer,
+      );
   }, [load]);
 
   async function submit(
@@ -101,28 +149,39 @@ export default function WorkerManagement() {
     setMessage("");
 
     try {
-      const result =
-        await createUser({
-          name:
-            form.name.trim(),
-          email:
-            form.email.trim(),
-          phone:
-            form.phone.trim(),
-          role: "worker",
-        });
+      await createWorker({
+        name:
+          form.name.trim(),
+
+        phone:
+          form.phone.trim() ||
+          null,
+
+        email:
+          form.email.trim() ||
+          null,
+
+        national_id:
+          form.national_id.trim() ||
+          null,
+      });
 
       setMessage(
-        result.credentials_email_sent
-          ? "Worker created and credentials sent."
-          : "Worker created successfully.",
+        "Worker created successfully. No login account was created.",
       );
 
-      setForm(emptyForm);
-      setModalOpen(false);
+      setForm(
+        emptyForm,
+      );
+
+      setModalOpen(
+        false,
+      );
 
       await load();
-    } catch (requestError) {
+    } catch (
+      requestError
+    ) {
       setError(
         requestError
           instanceof Error
@@ -130,7 +189,9 @@ export default function WorkerManagement() {
           : "Unable to create Worker.",
       );
     } finally {
-      setSaving(false);
+      setSaving(
+        false,
+      );
     }
   }
 
@@ -143,22 +204,39 @@ export default function WorkerManagement() {
           </h2>
 
           <p className="mt-1 text-sm font-medium text-slate-700">
-            Manage factory Workers
-            and make them available
-            for Payroll.
+            Manage casual factory workers used for attendance and payroll.
           </p>
         </div>
 
         <button
           type="button"
           onClick={() =>
-            setModalOpen(true)
+            setModalOpen(
+              true,
+            )
           }
-          className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#075b38] px-4 text-sm font-semibold text-white"
+          className="inline-flex h-11 items-center gap-2 rounded-xl bg-[#075b38] px-4 text-sm font-semibold text-white transition hover:bg-[#064a2e]"
         >
           <CirclePlus size={18} />
           Add Worker
         </button>
+      </div>
+
+      <div className="flex items-start gap-3 rounded-xl border border-[#e5ded4] bg-[#faf7f1] p-4">
+        <UserRound
+          size={19}
+          className="mt-0.5 shrink-0 text-[#075b38]"
+        />
+
+        <div>
+          <p className="text-sm font-semibold text-slate-900">
+            Casual workers do not need system accounts
+          </p>
+
+          <p className="mt-1 text-xs leading-5 text-slate-600">
+            Only the worker's name is required. Phone, email and National ID are optional.
+          </p>
+        </div>
       </div>
 
       {message ? (
@@ -183,13 +261,17 @@ export default function WorkerManagement() {
 
             <input
               value={search}
-              onChange={(event) =>
+              onChange={(
+                event,
+              ) =>
                 setSearch(
-                  event.target.value,
+                  event
+                    .target
+                    .value,
                 )
               }
-              placeholder="Search Worker..."
-              className="h-10 w-full rounded-lg border pl-10 pr-3 text-sm"
+              placeholder="Search name, phone, email, National ID..."
+              className="h-10 w-full rounded-lg border border-slate-300 pl-10 pr-3 text-sm outline-none focus:border-[#b88a45]"
             />
           </div>
 
@@ -200,27 +282,42 @@ export default function WorkerManagement() {
             }
             className="inline-flex items-center justify-center gap-2 rounded-lg border px-4 text-sm font-semibold"
           >
-            <RefreshCw size={16} />
+            <RefreshCw
+              size={16}
+            />
+
             Refresh
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table className="w-full min-w-[900px] text-left text-sm">
             <thead className="bg-[#faf7f1] text-xs uppercase text-slate-500">
               <tr>
                 <th className="px-4 py-3">
                   Worker
                 </th>
+
                 <th className="px-4 py-3">
                   Phone
                 </th>
+
+                <th className="px-4 py-3">
+                  Email
+                </th>
+
+                <th className="px-4 py-3">
+                  National ID
+                </th>
+
+                <th className="px-4 py-3">
+                  Account
+                </th>
+
                 <th className="px-4 py-3">
                   Status
                 </th>
-                <th className="px-4 py-3">
-                  Payroll
-                </th>
+
                 <th className="px-4 py-3">
                   Action
                 </th>
@@ -231,7 +328,7 @@ export default function WorkerManagement() {
               {loading ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={7}
                     className="py-10 text-center text-slate-500"
                   >
                     Loading Workers...
@@ -239,14 +336,25 @@ export default function WorkerManagement() {
                 </tr>
               ) : workers.length ? (
                 workers.map(
-                  (worker) => (
-                    <tr key={worker.id}>
+                  (
+                    worker,
+                  ) => (
+                    <tr
+                      key={
+                        worker.id
+                      }
+                    >
                       <td className="px-4 py-3">
                         <p className="font-semibold text-slate-950">
-                          {worker.name}
+                          {
+                            worker.name
+                          }
                         </p>
-                        <p className="text-xs text-slate-600">
-                          {worker.email}
+
+                        <p className="mt-0.5 text-xs text-slate-500">
+                          {
+                            worker.worker_code
+                          }
                         </p>
                       </td>
 
@@ -255,29 +363,56 @@ export default function WorkerManagement() {
                           "—"}
                       </td>
 
-                      <td className="px-4 py-3 capitalize text-slate-700">
-                        {worker.status ??
-                          "active"}
+                      <td className="px-4 py-3 text-slate-700">
+                        {worker.email ??
+                          "—"}
+                      </td>
+
+                      <td className="px-4 py-3 text-slate-700">
+                        {worker.national_id ??
+                          "—"}
                       </td>
 
                       <td className="px-4 py-3">
-                        <Link
-                          href="/dashboard/finance/payroll"
-                          className="text-xs font-semibold text-[#075b38]"
+                        <span
+                          className={
+                            worker.has_account
+                              ? "rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700"
+                              : "rounded-full bg-[#f6e7d2] px-2.5 py-1 text-xs font-semibold text-[#80570f]"
+                          }
                         >
-                          Open Payroll
-                        </Link>
+                          {worker.has_account
+                            ? "Has account"
+                            : "No login account"}
+                        </span>
                       </td>
 
                       <td className="px-4 py-3">
-                        {worker.is_active ? (
+                        <span
+                          className={
+                            worker.status ===
+                            "active"
+                              ? "rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700"
+                              : "rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600"
+                          }
+                        >
+                          {
+                            worker.status
+                          }
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3">
+                        {worker.status ===
+                        "active" ? (
                           <button
                             type="button"
                             onClick={async () => {
-                              await updateUserStatus(
+                              await updateWorkerStatus(
                                 worker.id,
                                 "inactive",
                               );
+
                               await load();
                             }}
                             className="text-xs font-semibold text-amber-700"
@@ -288,10 +423,11 @@ export default function WorkerManagement() {
                           <button
                             type="button"
                             onClick={async () => {
-                              await updateUserStatus(
+                              await updateWorkerStatus(
                                 worker.id,
                                 "active",
                               );
+
                               await load();
                             }}
                             className="text-xs font-semibold text-[#075b38]"
@@ -306,7 +442,7 @@ export default function WorkerManagement() {
               ) : (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={7}
                     className="py-10 text-center text-slate-500"
                   >
                     No Workers found.
@@ -321,8 +457,10 @@ export default function WorkerManagement() {
       {modalOpen ? (
         <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-950/50 p-4">
           <form
-            onSubmit={submit}
-            className="w-full max-w-xl rounded-2xl bg-white"
+            onSubmit={
+              submit
+            }
+            className="w-full max-w-xl rounded-2xl bg-white shadow-xl"
           >
             <div className="flex items-center justify-between border-b p-5">
               <div>
@@ -330,10 +468,8 @@ export default function WorkerManagement() {
                   Add Worker
                 </h3>
 
-                <p className="mt-1 text-xs font-medium text-slate-700">
-                  The Worker will
-                  automatically become
-                  available in Payroll.
+                <p className="mt-1 text-xs font-medium text-slate-600">
+                  Create a casual Worker without creating a login account.
                 </p>
               </div>
 
@@ -345,53 +481,101 @@ export default function WorkerManagement() {
                   )
                 }
               >
-                <X size={20} />
+                <X
+                  size={20}
+                />
               </button>
             </div>
 
             <div className="space-y-4 p-5">
-              <input
+              <Field
+                label="Full name"
                 required
-                placeholder="Full name"
-                value={form.name}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    name:
-                      e.target.value,
-                  })
-                }
-                className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-1 focus:ring-[#b88a45]/20"
-              />
+              >
+                <input
+                  required
+                  placeholder="Worker full name"
+                  value={
+                    form.name
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setForm({
+                      ...form,
+                      name:
+                        event
+                          .target
+                          .value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                />
+              </Field>
 
-              <input
-                required
-                type="email"
-                placeholder="Email"
-                value={form.email}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    email:
-                      e.target.value,
-                  })
-                }
-                className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-1 focus:ring-[#b88a45]/20"
-              />
+              <Field label="Phone">
+                <input
+                  placeholder="Optional"
+                  value={
+                    form.phone
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setForm({
+                      ...form,
+                      phone:
+                        event
+                          .target
+                          .value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                />
+              </Field>
 
-              <input
-                required
-                placeholder="Phone"
-                value={form.phone}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    phone:
-                      e.target.value,
-                  })
-                }
-                className="h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-slate-950 outline-none placeholder:text-slate-500 focus:border-[#b88a45] focus:ring-1 focus:ring-[#b88a45]/20"
-              />
+              <Field label="Email">
+                <input
+                  type="email"
+                  placeholder="Optional"
+                  value={
+                    form.email
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setForm({
+                      ...form,
+                      email:
+                        event
+                          .target
+                          .value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                />
+              </Field>
+
+              <Field label="National ID">
+                <input
+                  placeholder="Optional"
+                  value={
+                    form.national_id
+                  }
+                  onChange={(
+                    event,
+                  ) =>
+                    setForm({
+                      ...form,
+                      national_id:
+                        event
+                          .target
+                          .value,
+                    })
+                  }
+                  className="h-11 w-full rounded-lg border border-slate-300 px-3 text-sm outline-none focus:border-[#b88a45]"
+                />
+              </Field>
             </div>
 
             <div className="flex justify-end gap-2 border-t p-5">
@@ -402,14 +586,16 @@ export default function WorkerManagement() {
                     false,
                   )
                 }
-                className="rounded-lg border px-4 py-2"
+                className="rounded-lg border px-4 py-2 text-sm"
               >
                 Cancel
               </button>
 
               <button
-                disabled={saving}
-                className="rounded-lg bg-[#075b38] px-5 py-2 font-semibold text-white disabled:opacity-50"
+                disabled={
+                  saving
+                }
+                className="rounded-lg bg-[#075b38] px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
               >
                 {saving
                   ? "Creating..."
@@ -420,5 +606,36 @@ export default function WorkerManagement() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+function Field({
+  label,
+  required = false,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children:
+    ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-semibold text-slate-700">
+        {label}
+
+        {required ? (
+          <span className="ml-1 text-red-500">
+            *
+          </span>
+        ) : (
+          <span className="ml-1 font-normal text-slate-400">
+            (optional)
+          </span>
+        )}
+      </span>
+
+      {children}
+    </label>
   );
 }
