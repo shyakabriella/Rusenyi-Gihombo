@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import {
+  CalendarCheck2,
   ChartNoAxesColumnIncreasing,
   ChevronLeft,
   CircleDollarSign,
@@ -44,6 +45,11 @@ const menuItems = [
     label: "People",
     href: "/dashboard/people",
     icon: Users,
+  },
+  {
+    label: "Attendance",
+    href: "/dashboard/attendance",
+    icon: CalendarCheck2,
   },
   {
     label: "Finance",
@@ -123,6 +129,7 @@ export default function DashboardSidebar() {
     "/dashboard",
     "/dashboard/coffee-operations",
     "/dashboard/finance",
+    "/dashboard/attendance",
     "/dashboard/reports",
   ];
 

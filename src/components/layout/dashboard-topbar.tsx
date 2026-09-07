@@ -43,6 +43,14 @@ function getPageTitle(
 
   if (
     pathname.startsWith(
+      "/dashboard/attendance",
+    )
+  ) {
+    return "Attendance";
+  }
+
+  if (
+    pathname.startsWith(
       "/dashboard/administration/coffee-prices",
     )
   ) {

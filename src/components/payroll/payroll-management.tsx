@@ -184,7 +184,8 @@ export default function PayrollManagement() {
 
   const canManage =
     role === "admin" ||
-    role === "accountant";
+    role === "accountant" ||
+    role === "store";
 
   const salaryPreview =
     useMemo(() => {
@@ -381,7 +382,7 @@ export default function PayrollManagement() {
   function validatePayrollForm() {
     if (!employeeId) {
       setError(
-        "Select an employee.",
+        "Select a Worker.",
       );
       return false;
     }
@@ -956,7 +957,7 @@ export default function PayrollManagement() {
             className={inputClass}
           >
             <option value="">
-              All Employees
+              All Workers
             </option>
 
             {employees.map(
@@ -1839,7 +1840,7 @@ function PayrollForm({
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2">
-        <Field label="Employee">
+        <Field label="Worker">
           <select
             value={employeeId}
             onChange={(event) =>
@@ -1850,7 +1851,7 @@ function PayrollForm({
             className={inputClass}
           >
             <option value="">
-              Select Employee
+              Select Worker
             </option>
 
             {employees.map(
