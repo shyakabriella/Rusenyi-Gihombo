@@ -1,12 +1,12 @@
-import { apiRequest } from "@/lib/api";
+import {
+  apiRequest,
+} from "@/lib/api";
 
 import type {
-  DashboardRole,
-  PettyCashList,
-  PettyCashStatus,
+  PettyCashRequest,
+  PettyCashRequestList,
+  PettyCashRequestStatus,
   PettyCashSummary,
-  PettyCashTransaction,
-  PettyCashTransactionType,
 } from "@/types/petty-cash";
 
 type ApiResponse<T> = {
@@ -15,12 +15,23 @@ type ApiResponse<T> = {
   data: T;
 };
 
+type LaravelPaginator<T> = {
+  data: T[];
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+};
+
 function unwrap<T>(
-  response: ApiResponse<T> | T,
+  response:
+    | ApiResponse<T>
+    | T,
 ): T {
   if (
     response &&
-    typeof response === "object" &&
+    typeof response ===
+      "object" &&
     "data" in response
   ) {
     return (
@@ -31,116 +42,158 @@ function unwrap<T>(
   return response as T;
 }
 
-export async function getPettyCashRole(): Promise<DashboardRole> {
-  const response = await apiRequest<
-    ApiResponse<{
-      role: DashboardRole;
-    }>
-  >("/me");
+export async function getPettyCashSummary() {
+  const response =
+    await apiRequest<
+      ApiResponse<PettyCashSummary>
+    >(
+      "/petty-cash/requests/summary",
+      {
+        method: "GET",
+      },
+    );
 
-  return unwrap(response).role;
+  return unwrap(
+    response,
+  );
 }
 
-export async function getPettyCashTransactions(
+export async function getPettyCashRequests(
   params: {
-    search?: string;
-    transaction_type?: PettyCashTransactionType;
-    status?: PettyCashStatus;
-    category?: string;
-    date_from?: string;
-    date_to?: string;
+    status?:
+      PettyCashRequestStatus;
+
     page?: number;
     per_page?: number;
   } = {},
-): Promise<PettyCashList> {
-  const query = new URLSearchParams();
+): Promise<PettyCashRequestList> {
+  const query =
+    new URLSearchParams();
 
-  Object.entries(params).forEach(
-    ([key, value]) => {
-      if (
-        value !== undefined &&
-        value !== ""
-      ) {
-        query.set(
-          key,
-          String(value),
-        );
-      }
-    },
+  if (params.status) {
+    query.set(
+      "status",
+      params.status,
+    );
+  }
+
+  query.set(
+    "page",
+    String(
+      params.page ?? 1,
+    ),
   );
 
-  const suffix = query.toString()
-    ? `?${query.toString()}`
-    : "";
+  query.set(
+    "per_page",
+    String(
+      params.per_page ?? 15,
+    ),
+  );
 
-  const response = await apiRequest<
-    ApiResponse<PettyCashList>
-  >(`/petty-cash${suffix}`);
+  const response =
+    await apiRequest<
+      ApiResponse<
+        LaravelPaginator<
+          PettyCashRequest
+        >
+      >
+    >(
+      `/petty-cash/requests?${query.toString()}`,
+      {
+        method: "GET",
+      },
+    );
 
-  return unwrap(response);
+  const data =
+    unwrap(response);
+
+  return {
+    items:
+      data.data ?? [],
+
+    pagination: {
+      current_page:
+        data.current_page,
+
+      last_page:
+        data.last_page,
+
+      per_page:
+        data.per_page,
+
+      total:
+        data.total,
+    },
+  };
 }
 
-export async function getPettyCashSummary(): Promise<PettyCashSummary> {
-  const response = await apiRequest<
-    ApiResponse<PettyCashSummary>
-  >("/petty-cash/summary");
-
-  return unwrap(response);
-}
-
-export async function getPettyCashTransaction(
-  id: number,
-): Promise<PettyCashTransaction> {
-  const response = await apiRequest<
-    ApiResponse<PettyCashTransaction>
-  >(`/petty-cash/${id}`);
-
-  return unwrap(response);
-}
-
-export async function createPettyCashTransaction(
+export async function createPettyCashRequest(
   payload: {
-    transaction_date: string;
-    transaction_type: "fund_in" | "expense";
     amount: number;
-    category?: string;
-    counterparty_name: string;
     purpose: string;
-    reference_number?: string;
-    receipt_number?: string;
-    notes?: string;
   },
-): Promise<PettyCashTransaction> {
-  const response = await apiRequest<
-    ApiResponse<PettyCashTransaction>
-  >(
-    "/petty-cash",
+) {
+  const response =
+    await apiRequest<
+      ApiResponse<PettyCashRequest>
+    >(
+      "/petty-cash/requests",
+      {
+        method: "POST",
+        body:
+          JSON.stringify(
+            payload,
+          ),
+      },
+    );
+
+  return unwrap(
+    response,
+  );
+}
+
+export async function approvePettyCashRequest(
+  id: number,
+) {
+  return apiRequest(
+    `/petty-cash/requests/${id}/approve`,
     {
       method: "POST",
-      body: JSON.stringify(payload),
     },
   );
-
-  return unwrap(response);
 }
 
-export async function reversePettyCashTransaction(
+export async function rejectPettyCashRequest(
   id: number,
-  reversalReason: string,
-): Promise<PettyCashTransaction> {
-  const response = await apiRequest<
-    ApiResponse<PettyCashTransaction>
-  >(
-    `/petty-cash/${id}/reverse`,
+  reason: string,
+) {
+  return apiRequest(
+    `/petty-cash/requests/${id}/reject`,
     {
-      method: "PATCH",
+      method: "POST",
 
-      body: JSON.stringify({
-        reversal_reason:
-          reversalReason,
-      }),
+      body:
+        JSON.stringify({
+          reason,
+        }),
     },
   );
+}
 
-  return unwrap(response);
+export async function cancelPettyCashRequest(
+  id: number,
+  reason: string,
+) {
+  return apiRequest(
+    `/petty-cash/requests/${id}/cancel`,
+    {
+      method: "POST",
+
+      body:
+        JSON.stringify({
+          reason,
+        }),
+    },
+  );
 }

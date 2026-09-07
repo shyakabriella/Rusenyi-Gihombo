@@ -1,83 +1,82 @@
-export type PettyCashTransactionType =
-  | "fund_in"
-  | "expense"
-  | "reversal";
+export type PettyCashRequestStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
 
-export type PettyCashStatus =
-  | "posted"
-  | "reversed";
-
-export type PettyCashUser = {
+export type PettyCashPerson = {
   id: number;
   name: string;
   email?: string | null;
 };
 
-export type PettyCashExpense = {
+export type PettyCashRequest = {
   id: number;
-  expense_code: string;
-  expense_date: string;
-  category: string;
-  payee_name: string;
+  request_code: string;
+  requested_by: number;
+
   amount: string;
   currency: string;
-  status: string;
-};
-
-export type PettyCashTransaction = {
-  id: number;
-  transaction_code: string;
-  transaction_date: string;
-
-  transaction_type: PettyCashTransactionType;
-
-  amount: string;
-  balance_before: string;
-  balance_after: string;
-
-  currency: string;
-
-  category?: string | null;
-  counterparty_name: string;
   purpose: string;
 
-  reference_number?: string | null;
-  receipt_number?: string | null;
+  status:
+    PettyCashRequestStatus;
 
-  expense_id?: number | null;
-  reverses_transaction_id?: number | null;
+  requester?:
+    | PettyCashPerson
+    | null;
 
-  status: PettyCashStatus;
+  approver?:
+    | PettyCashPerson
+    | null;
 
-  notes?: string | null;
+  rejecter?:
+    | PettyCashPerson
+    | null;
 
-  posted_at?: string | null;
-  reversed_at?: string | null;
-  reversal_reason?: string | null;
+  canceller?:
+    | PettyCashPerson
+    | null;
 
-  expense?: PettyCashExpense | null;
-  poster?: PettyCashUser | null;
-  reverser?: PettyCashUser | null;
+  approved_at?:
+    | string
+    | null;
 
-  reversed_transaction?: PettyCashTransaction | null;
+  rejected_at?:
+    | string
+    | null;
+
+  rejection_reason?:
+    | string
+    | null;
+
+  cancelled_at?:
+    | string
+    | null;
+
+  cancellation_reason?:
+    | string
+    | null;
+
+  created_at: string;
+  updated_at: string;
 };
 
 export type PettyCashSummary = {
-  current_balance: string;
-  total_funded: string;
-  total_spent: string;
-  today_spent: string;
-  this_month_spent: string;
-
-  funding_transactions: number;
-  expense_transactions: number;
-  reversal_transactions: number;
-
   currency: string;
+  balance: string;
+
+  total_requests: number;
+  pending_requests: number;
+  approved_requests: number;
+  approved_amount: string;
+  rejected_requests: number;
+  cancelled_requests: number;
 };
 
-export type PettyCashList = {
-  items: PettyCashTransaction[];
+export type PettyCashRequestList = {
+  items:
+    PettyCashRequest[];
 
   pagination: {
     current_page: number;
@@ -86,8 +85,3 @@ export type PettyCashList = {
     total: number;
   };
 };
-
-export type DashboardRole =
-  | "admin"
-  | "accountant"
-  | string;
