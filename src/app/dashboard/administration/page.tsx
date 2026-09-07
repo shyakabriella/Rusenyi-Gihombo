@@ -206,34 +206,7 @@ export default function AdministrationPage() {
           })}
         </section>
 
-        {/* SYSTEM CONFIGURATION SUMMARY */}
-        <section className="overflow-hidden rounded-xl border border-[#e5ded4] bg-white shadow-sm">
-          <div className="border-b border-[#e9e2d9] px-5 py-4">
-            <h2 className="text-base font-bold text-slate-950">
-              Configuration Overview
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3">
-            <OverviewItem
-              number="01"
-              title="Location Structure"
-              description="Defines where farmers, agents and collection activities operate."
-            />
-
-            <OverviewItem
-              number="02"
-              title="Coffee Season"
-              description="Defines the operational period used for coffee transactions."
-            />
-
-            <OverviewItem
-              number="03"
-              title="Coffee Pricing"
-              description="Defines the active buying price used during coffee purchases."
-            />
-          </div>
-        </section>
+      
       </div>
     </AdminOnly>
   );
